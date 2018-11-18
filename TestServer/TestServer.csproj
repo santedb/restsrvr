@@ -46,15 +46,24 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleBehavior.cs" />
+    <Compile Include="ServiceObjectSample.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SanteDB.RestSrv\SanteDB.RestSrv.csproj">
+    <ProjectReference Include="..\SanteDB.RestSrv\RestSrvr.csproj">
       <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
-      <Name>SanteDB.RestSrv</Name>
+      <Name>RestSrvr</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="sample.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv.Exceptions
+namespace RestSrvr.Exceptions
 {
     /// <summary>
     /// Represents a fault

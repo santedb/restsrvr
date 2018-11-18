@@ -1,4 +1,5 @@
-﻿using SanteDB.RestSrv;
+﻿using RestSrvr;
+using RestSrvr.Bindings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,11 @@ namespace TestServer
         static void Main(string[] args)
         {
 
-            var httpServer = new RestService(typeof(SampleBehavior));
+            var rservice = new RestService(typeof(SampleBehavior));
+            rservice.AddServiceEndpoint(new Uri("http://0.0.0.0:8080/fhir"), typeof(ISampleContract), new RestHttpBinding());
+            rservice.Start();
+            Console.ReadKey();
+
         }
     }
 }

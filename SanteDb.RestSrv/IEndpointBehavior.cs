@@ -1,4 +1,4 @@
-﻿namespace SanteDB.RestSrv
+﻿namespace RestSrvr
 {
     public interface IEndpointBehavior
     {

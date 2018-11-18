@@ -7,12 +7,12 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv.Message
+namespace RestSrvr.Message
 {
     /// <summary>
     /// Represents a response message
     /// </summary>
-    public class RestResponseMessage
+    public class RestResponseMessage : IDisposable
     {
         // Contents
         private Stream m_content;
@@ -40,6 +40,24 @@ namespace SanteDB.RestSrv.Message
         }
 
         /// <summary>
+        /// Gets or sets the response status code
+        /// </summary>
+        public int StatusCode
+        {
+            get => this.m_response.StatusCode;
+            set => this.m_response.StatusCode = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the status description
+        /// </summary>
+        public String StatusDescription
+        {
+            get => this.m_response.StatusDescription;
+            set => this.m_response.StatusDescription = value;
+        }
+
+        /// <summary>
         /// Gets the cookies to set on the response
         /// </summary>
         public CookieCollection Cookies => this.m_response.Cookies;
@@ -58,6 +76,22 @@ namespace SanteDB.RestSrv.Message
         internal void FlushResponseStream()
         {
             this.m_content?.CopyTo(this.m_response.OutputStream);
+        }
+
+        /// <summary>
+        /// Finalizer
+        /// </summary>
+        ~RestResponseMessage()
+        {
+            this.Dispose();
+        }
+
+        /// <summary>
+        /// Dispose
+        /// </summary>
+        public void Dispose()
+        {
+            this.m_content.Dispose();
         }
     }
 }

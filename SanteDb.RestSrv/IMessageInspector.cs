@@ -1,6 +1,6 @@
-﻿using SanteDB.RestSrv.Message;
+﻿using RestSrvr.Message;
 
-namespace SanteDB.RestSrv
+namespace RestSrvr
 {
     /// <summary>
     /// Represents a message inspector

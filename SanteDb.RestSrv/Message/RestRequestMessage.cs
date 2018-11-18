@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv.Message
+namespace RestSrvr.Message
 {
     /// <summary>
     /// Represents a restful message
@@ -56,6 +56,11 @@ namespace SanteDB.RestSrv.Message
         /// Gets the HTTP method
         /// </summary>
         public String Method => this.m_request.HttpMethod;
+
+        /// <summary>
+        /// Gets the Operational path
+        /// </summary>
+        public string OperationPath { get; internal set; }
 
         /// <summary>
         /// Initialize the rest message with the contents of the request message

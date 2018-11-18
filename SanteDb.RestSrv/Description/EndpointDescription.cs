@@ -1,27 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv.Description
+namespace RestSrvr.Description
 {
     /// <summary>
     /// Describes a single endpoint
     /// </summary>
     public class EndpointDescription
     {
+        // Trace source
+        private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);
 
         private ContractDescription m_contract;
-        private Uri m_listenUri;
+        private String m_listenUri;
 
         /// <summary>
         /// Creates a new endpoint description with the specified base URI and contract
         /// </summary>
         public EndpointDescription(Uri baseUri, ContractDescription contract)
         {
+            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter EndpointDescription CTOR ({0}, {1})", baseUri, contract);
             this.m_contract = contract;
-            this.m_listenUri = baseUri;
+
+            if (baseUri.Host == "0.0.0.0")
+                this.m_listenUri = baseUri.ToString().Replace("://0.0.0.0", "://+");
+            else 
+                this.m_listenUri = baseUri.ToString();
+            if (!this.m_listenUri.EndsWith("/"))
+                this.m_listenUri += "/";
         }
 
         /// <summary>
@@ -41,7 +51,7 @@ namespace SanteDB.RestSrv.Description
         /// <summary>
         /// The listening URI for the endpoint
         /// </summary>
-        public Uri ListenUri => this.m_listenUri;
+        public String ListenUri => this.m_listenUri;
 
     }
 }

@@ -5,14 +5,33 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using RestSrvr.Attributes;
+using System.Diagnostics;
 
-namespace SanteDB.RestSrv.Description
+namespace RestSrvr.Description
 {
     /// <summary>
     /// Represents an operation description
     /// </summary>
     public class OperationDescription
     {
+
+        // Trace source
+        private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);
+
+        /// <summary>
+        /// Operation description
+        /// </summary>
+        public OperationDescription(MethodInfo operationMethod)
+        {
+            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter OperationDescription CTOR ({0})", operationMethod);
+            this.InvokeMethod = operationMethod;
+            var restAttribute = operationMethod.GetCustomAttribute<RestInvokeAttribute>();
+            if (restAttribute == null)
+                throw new InvalidOperationException($"Method {operationMethod.Name} does not have [RestInvokeAttribute] and cannot be used as an operation");
+            this.Method = restAttribute.Method;
+            this.UriTemplate = restAttribute.UrlTemplate;
+        }
 
         /// <summary>
         /// Invoke the specified method

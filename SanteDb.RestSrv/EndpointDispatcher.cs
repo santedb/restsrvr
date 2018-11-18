@@ -1,7 +1,8 @@
-﻿using SanteDB.RestSrv.Exceptions;
-using SanteDB.RestSrv.Message;
+﻿using RestSrvr.Exceptions;
+using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,7 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv
+namespace RestSrvr
 {
     /// <summary>
     /// The service dispatcher is responsible for linking the HTTP listener to the
@@ -18,6 +19,10 @@ namespace SanteDB.RestSrv
     /// </summary>
     public class EndpointDispatcher
     {
+
+        // Trace source
+        private TraceSource m_traceSource = new TraceSource(TraceSources.DispatchTraceSourceName);
+
         // The rest service that is attached to this dispatcher
         private ServiceEndpoint m_serviceEndpoint;
         private Regex m_endpointRegex;
@@ -34,7 +39,7 @@ namespace SanteDB.RestSrv
         public EndpointDispatcher(ServiceEndpoint serviceEndpoint)
         {
             this.m_serviceEndpoint = serviceEndpoint;
-            this.m_endpointRegex = new Regex($"^{serviceEndpoint.Description.ListenUri.Scheme}://.*?:{serviceEndpoint.Description.ListenUri.Port}{serviceEndpoint.Description.ListenUri.AbsolutePath}/?.*");
+            this.m_endpointRegex = new Regex($"^({serviceEndpoint.Description.ListenUri.Replace("://+", "://.+?")})/?.*");
         }
 
         /// <summary>
@@ -42,10 +47,17 @@ namespace SanteDB.RestSrv
         /// </summary>
         internal bool CanDispatch(RestRequestMessage requestMessage)
         {
+            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "EndpointDispatcher.CanDispatch -> {0} (EPRx: {1})", requestMessage.Url, this.m_endpointRegex);
+
             // Match the path
-            return this.m_endpointRegex.IsMatch(requestMessage.Url.ToString()) &&
-                this.m_serviceEndpoint.Operations.Any(o=>o.Dispatcher.CanDispatch(requestMessage));
+            if (this.m_endpointRegex.IsMatch(requestMessage.Url.ToString()))
+            {
+                requestMessage.OperationPath = this.GetOperationPath(requestMessage.Url);
+                return this.m_serviceEndpoint.Operations.Any(o => o.Dispatcher.CanDispatch(requestMessage));
+            }
+            else return false;
         }
+
 
         /// <summary>
         /// Dispatch the HttpRequest message to the appropriate service
@@ -56,9 +68,12 @@ namespace SanteDB.RestSrv
             // Allow message inspectors to inspect the message before next stage
             try
             {
+
+                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin endpoint dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_serviceEndpoint.Description.Contract);
+
                 foreach (var mfi in this.m_messageInspector)
                     mfi.AfterReceiveRequest(requestMessage);
-
+                
                 var op = this.m_serviceEndpoint.Operations.FirstOrDefault(o => o.Dispatcher.CanDispatch(requestMessage));
                 if (op == null)
                     throw new FaultException<String>(HttpStatusCode.NotFound, "Specified resource was not found");
@@ -72,9 +87,21 @@ namespace SanteDB.RestSrv
             }
             catch(Exception e)
             {
-                return serviceDispatcher.HandleFault(e);
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                return serviceDispatcher.HandleFault(e, responseMessage);
             }
         }
-
+        
+        /// <summary>
+        /// Gets the operation path (drops the base URL)
+        /// </summary>
+        internal String GetOperationPath(Uri requestUrl)
+        {
+            var matches = this.m_endpointRegex.Match(requestUrl.ToString());
+            if (matches.Success)
+                return requestUrl.ToString().Substring(matches.Groups[1].Value.Length);
+            else
+                throw new InvalidOperationException("Cannot match this path");
+        }
     }
 }

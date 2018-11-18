@@ -1,7 +1,7 @@
-﻿using SanteDB.RestSrv.Message;
+﻿using RestSrvr.Message;
 using System;
 
-namespace SanteDB.RestSrv
+namespace RestSrvr
 {
     /// <summary>
     /// Represents a class which can handle service faults

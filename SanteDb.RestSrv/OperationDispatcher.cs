@@ -1,17 +1,22 @@
-﻿using SanteDB.RestSrv.Exceptions;
-using SanteDB.RestSrv.Message;
+﻿using RestSrvr.Exceptions;
+using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv
+namespace RestSrvr
 {
     class OperationDispatcher
     {
+
+        private TraceSource m_traceSource = new TraceSource(TraceSources.DispatchTraceSourceName);
+
         /// <summary>
         /// Represents the operation path regex
         /// </summary>
@@ -20,6 +25,7 @@ namespace SanteDB.RestSrv
         // Endpoint operation
         private EndpointOperation m_endpointOperation;
         private Regex m_dispatchRegex;
+        private string[] m_regexGroupNames;
 
         /// <summary>
         /// Gets or sets the dispatch formatter
@@ -32,25 +38,29 @@ namespace SanteDB.RestSrv
         public OperationDispatcher(EndpointOperation endpointOperation)
         {
             this.m_endpointOperation = endpointOperation;
-
             var match = this.m_templateParser.Match(endpointOperation.Description.UriTemplate);
-            var regexBuilder = new StringBuilder("^.*?/");
-            while(match.Success)
-            {
-                int parmCount = 0;
-                Type[] parmTypes = endpointOperation.Description.InvokeMethod.GetParameters().Select(o => o.ParameterType).ToArray();
+            var regexBuilder = new StringBuilder("^");
 
+            this.DispatchFormatter = new DefaultDispatchFormatter();
+
+            Type[] parmTypes = endpointOperation.Description.InvokeMethod.GetParameters().Select(o => o.ParameterType).ToArray();
+            m_regexGroupNames = new string[parmTypes.Length];
+            int parmCount = 0;
+
+            while (match.Success)
+            {
                 switch (match.Groups[1].Value[0])
                 {
                     case '{': // parameter
                         if (parmTypes.Length < parmCount) throw new InvalidOperationException($"REST method accepts {parmTypes.Length} parameters but route specifies more");
+                        m_regexGroupNames[parmCount] = match.Groups[1].Value;
                         var ptype = parmTypes[parmCount++];
                         switch(ptype.Name.ToLowerInvariant())
                         {
                             case "string":
-                                regexBuilder.Append("(.*?)");
+                                regexBuilder.Append(@"([A-Za-z0-9_\-%]*?)");
                                 break;
-                            case "int":
+                            case "int32":
                                 regexBuilder.Append("(\\d*?)");
                                 break;
                             case "guid":
@@ -68,10 +78,12 @@ namespace SanteDB.RestSrv
                         break;
                 }
 
-                regexBuilder.Append("/?");
+                regexBuilder.Append("/");
+                match = match.NextMatch();
             }
-            regexBuilder.Append("$");
+            regexBuilder.Append("?$");
 
+            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Operation {0} will be bound to {1}", endpointOperation.Description.InvokeMethod, regexBuilder);
             this.m_dispatchRegex = new Regex(regexBuilder.ToString(), RegexOptions.IgnoreCase);
         }
 
@@ -80,10 +92,11 @@ namespace SanteDB.RestSrv
         /// </summary>
         internal bool CanDispatch(RestRequestMessage requestMessage)
         {
-            return requestMessage.Method.ToLowerInvariant() == this.m_endpointOperation.Description.Method.ToLowerInvariant()
-                && this.m_dispatchRegex.IsMatch(requestMessage.Url.ToString());
-        }
+            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "OpertionDispatcher.CanDispatch -> {0} {1} (EPRx: {2}/{3})", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.Method, this.m_dispatchRegex);
 
+            return requestMessage.Method.ToLowerInvariant() == this.m_endpointOperation.Description.Method.ToLowerInvariant()
+               && this.m_dispatchRegex.IsMatch(requestMessage.OperationPath);
+        }
 
         /// <summary>
         /// Dispatch the message
@@ -92,9 +105,29 @@ namespace SanteDB.RestSrv
         {
             try
             {
+                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin operation dispatch of {0} {1} to {2}", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.InvokeMethod);
+
                 var invoke = this.m_endpointOperation.Description.InvokeMethod;
                 var parameters = new object[invoke.GetParameters().Length];
+
+                // By default parameters are passed by name
+                var parmMatch = this.m_dispatchRegex.Match(requestMessage.OperationPath);
+                for(int i = 0; i < this.m_regexGroupNames.Length; i++)
+                {
+                    var pindex = Array.FindIndex(invoke.GetParameters(), o => $"{{{o.Name}}}" == this.m_regexGroupNames[i]);
+                    var sparm = invoke.GetParameters()[pindex];
+                    object sval = parmMatch.Groups[i+1].Value;
+                    if (sparm.ParameterType == typeof(int))
+                        sval = Int32.Parse(sval.ToString());
+                    else if (sparm.ParameterType == typeof(Guid))
+                        sval = Guid.Parse(sval.ToString());
+
+                    parameters[pindex] = sval;
+                }
+
                 this.DispatchFormatter.SerializeRequest(this.m_endpointOperation, requestMessage, parameters);
+
+                this.m_traceSource.TraceData(TraceEventType.Verbose, 0, parameters);
 
                 // Validate parameters
                 if (!Enumerable.SequenceEqual(invoke.GetParameters().Select(o => o.ParameterType), parameters.Select(o => o.GetType())))
@@ -105,8 +138,14 @@ namespace SanteDB.RestSrv
                 this.DispatchFormatter.SerializeResponse(this.m_endpointOperation, responseMessage, parameters, result);
                 return true;
             }
+            catch(TargetInvocationException e)
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                return serviceDispatcher.HandleFault(e.InnerException, responseMessage);
+            }
             catch(Exception e)
             {
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
                 return serviceDispatcher.HandleFault(e, responseMessage);
             }
         }

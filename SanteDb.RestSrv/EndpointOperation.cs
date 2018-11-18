@@ -1,12 +1,18 @@
-﻿using SanteDB.RestSrv.Description;
+﻿using RestSrvr.Description;
 
-namespace SanteDB.RestSrv
+namespace RestSrvr
 {
     public class EndpointOperation
     {
         // The desccription of the operation
         private OperationDescription m_description;
         private OperationDispatcher m_dispatcher;
+        private ServiceEndpoint m_endpoint;
+
+        /// <summary>
+        /// Gets the endpoint
+        /// </summary>
+        internal ServiceEndpoint Endpoint => this.m_endpoint;
 
         /// <summary>
         /// Gets the dispatcher
@@ -22,9 +28,10 @@ namespace SanteDB.RestSrv
         /// Creates a new instance of the operation with the specified description
         /// </summary>
         /// <param name="operationDescription"></param>
-        public EndpointOperation(OperationDescription operationDescription)
+        public EndpointOperation(ServiceEndpoint endpoint, OperationDescription operationDescription)
         {
             this.m_description = operationDescription;
+            this.m_endpoint = endpoint;
             this.m_dispatcher = new OperationDispatcher(this);
         }
     }

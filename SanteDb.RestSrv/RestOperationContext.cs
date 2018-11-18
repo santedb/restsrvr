@@ -5,23 +5,24 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv
+namespace RestSrvr
 {
     /// <summary>
     /// Represents the current operation context for the rest service thread
     /// </summary>
-    public class WebOperationContext
+    public class RestOperationContext
     {
         // Current reference for thread
         [ThreadStatic]
-        private static WebOperationContext m_current;
+        private static RestOperationContext m_current;
+
         // Context
         private HttpListenerContext m_context;
 
         /// <summary>
         /// Creates a new operation context
         /// </summary>
-        internal WebOperationContext(HttpListenerContext context)
+        internal RestOperationContext(HttpListenerContext context)
         {
             this.m_context = context;
         }
@@ -39,6 +40,10 @@ namespace SanteDB.RestSrv
         /// <summary>
         /// Gets the current operation context
         /// </summary>
-        public static WebOperationContext Current => m_current;
+        public static RestOperationContext Current
+        {
+            get { return m_current; }
+            internal set { m_current = value; }
+        }
     }
 }

@@ -1,13 +1,14 @@
-﻿using SanteDB.RestSrv.Exceptions;
-using SanteDB.RestSrv.Message;
+﻿using RestSrvr.Exceptions;
+using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.RestSrv
+namespace RestSrvr
 {
     /// <summary>
     /// Represents a dispatcher that can call / invoke requests
@@ -17,8 +18,9 @@ namespace SanteDB.RestSrv
 
         // The service this is applied to
         private RestService m_service;
-        private List<IServiceErrorHandler> m_errorHandlers;
-        private List<IServicePolicy> m_servicePolicies;
+        private List<IServiceErrorHandler> m_errorHandlers = new List<IServiceErrorHandler>() { new DefaultErrorHandler() };
+        private List<IServicePolicy> m_servicePolicies = new List<IServicePolicy>();
+        private TraceSource m_traceSource = new TraceSource(TraceSources.DispatchTraceSourceName);
 
         /// <summary>
         /// Gets or sets the authorization provider
@@ -59,6 +61,7 @@ namespace SanteDB.RestSrv
         
             try
             {
+                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin service dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_service.Name);
                 // Apply the policy on the specified context
                 foreach (var pol in this.m_servicePolicies)
                     pol.Apply(requestMessage);
