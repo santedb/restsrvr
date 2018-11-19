@@ -35,3 +35,78 @@ The design principles of RestSrvr are very similar to WCF's WebHttpBinding. In s
 * **Endpoint**: An endpoint is an HTTP (or other) location where the service is accessed by callers.
 * **Behavior**: A behavior is a modifier on either an endpoint or an operation which impacts how each component operates at runtime
 * **Dispatcher**: A dispatcher is responsible for selecting the appropriate channel, endpoint and operation to execute in the execution context.
+
+## Example Use
+
+RestSrvr is nearly identical to WCF implementations:
+
+```
+using RestSrvr;
+using RestSrvr.Attributes;
+using System;
+using System.Xml.Serialization;
+using Newtonsoft.Json;
+using System.IO;
+using System.Text;
+
+/// <summary>
+/// RestSrvr will format requests in either JSON or XML depending on the Accept header passed to it
+/// </summary>
+[XmlRoot("Patient", Namespace = "http://test.com")]
+[JsonObject]
+public class Patient {
+
+    [XmlElement("id"), JsonProperty("id")]
+    public String Id { get; set; }
+
+}
+
+/// <summary>
+/// This is the contract which is decorated to inform routing of the service
+/// </summary>
+[RestContract(Name = "MyContract")]
+public interface IMyContract {
+    
+    [Get("/index.html")]
+    Stream Index();
+
+    [Get("/Patient/{id}")]
+    Patient GetPatient(String id);
+
+}
+
+/// <summary>
+/// The behavior implements one or more contracts
+/// </summary>
+[RestBehavior(Name = "DefaultMyBehavior")]
+public class MyBehavior : IMyContract {
+
+    public Stream Index() {
+        return new MemoryStream(Encoding.UTF.GetBytes("<html><body>Hello World!</body></html>"));
+    }
+
+    public Patient GetPatient(String id) {
+        return new Patient() { Id = id }; // Echo back the id
+    }
+}
+
+/// <summary>
+/// The main program adds an endpoint and then runs the service
+/// </summary>
+class Program {
+
+    static void Main(string[] args)
+    {
+        var myservce = new RestService(typeof(MyBehavior));
+        myservice.AddServiceEndpoint(new Uri("http://0.0.0.0:8080/myservice"), typeof(IMyService), new RestHttpBinding());
+        myservice.Start();
+        Console.ReadKey();
+    }
+}
+
+```
+
+You may get an access denied exception on Windows. In overcome this:
+
+* Use a user port (usually above port 10000)
+* Reserve the port using ```netsh http add urlacl url="http://+:8080/myservice" user=username```
