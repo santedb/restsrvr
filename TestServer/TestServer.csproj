@@ -54,18 +54,18 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SanteDB.RestSrv\RestSrvr.csproj">
-      <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
-      <Name>RestSrvr</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="sample.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RestSrvr\RestSrvr.csproj">
+      <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

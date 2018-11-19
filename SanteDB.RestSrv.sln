@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSrvr", "SanteDB.RestSrv\RestSrvr.csproj", "{16EF1840-0361-439D-806C-92D0411122EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestSrvr", "RestSrvr\RestSrvr.csproj", "{16EF1840-0361-439D-806C-92D0411122EB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServer", "TestServer\TestServer.csproj", "{AA0CDC72-524A-40C4-9E60-B07A5F3FA5C3}"
 EndProject
