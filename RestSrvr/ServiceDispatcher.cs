@@ -28,6 +28,14 @@ namespace RestSrvr
         public IEnumerable<IServicePolicy> Policies => this.m_servicePolicies.AsReadOnly();
 
         /// <summary>
+        /// Add service policy
+        /// </summary>
+        public void AddServiceDispatcherPolicy(IServicePolicy policy)
+        {
+            this.m_servicePolicies.Add(policy);
+        }
+
+        /// <summary>
         /// Gets the error handlers on this service
         /// </summary>
         public List<IServiceErrorHandler> ErrorHandlers => this.m_errorHandlers;

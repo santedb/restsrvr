@@ -32,7 +32,7 @@ namespace RestSrvr.Bindings
         /// <summary>
         /// Attach the specified endpoint to this REST binding
         /// </summary>
-        public void AttachEndpoint(RestService serviceContext, ServiceEndpoint endpoint)
+        public void AttachEndpoint(ServiceDispatcher serviceDispatcher, ServiceEndpoint endpoint)
         {
             if (this.m_httpListener != null)
                 throw new InvalidOperationException("Cannot attach endpoint to running listener");
@@ -41,10 +41,7 @@ namespace RestSrvr.Bindings
             this.m_httpListener = new HttpListener();
 
             this.m_httpListener.Prefixes.Add(endpoint.Description.ListenUri);
-
-
-            // TODO: Apply Behaviors
-            this.m_serviceDispatcher = new ServiceDispatcher(serviceContext);
+            this.m_serviceDispatcher = serviceDispatcher;
 
             // Instantiate the 
             this.m_acceptThread = new Thread(() =>
@@ -99,6 +96,17 @@ namespace RestSrvr.Bindings
             this.m_httpListener.Start();
             this.m_acceptThread.Start();
 
+        }
+
+        /// <summary>
+        /// Stop the listener
+        /// </summary>
+        public void DetachEndpoint(ServiceEndpoint endpoint)
+        {
+            this.m_traceSource?.TraceInformation("Stopping RestHttpBinding services...");
+            this.m_httpListener?.Stop();
+            this.m_httpListener.Close();
+            this.m_httpListener = null;
         }
     }
 }

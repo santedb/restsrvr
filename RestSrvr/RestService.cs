@@ -24,12 +24,32 @@ namespace RestSrvr
         // Trace source
         private TraceSource m_traceSource = new TraceSource(TraceSources.TraceSourceName);
 
+        // Service behaviors
+        private List<IServiceBehavior> m_serviceBehaviors = new List<IServiceBehavior>();
+
+        /// <summary>
+        /// Gets the current service behaviors
+        /// </summary>
+        public IEnumerable<IServiceBehavior> ServiceBehaviors => this.m_serviceBehaviors.AsReadOnly();
+
+        /// <summary>
+        /// Get whether the service is running
+        /// </summary>
+        public bool IsRunning { get; private set;  }
+
         /// <summary>
         /// Start this service
         /// </summary>
         public void Start()
         {
+            if (this.IsRunning)
+                throw new InvalidOperationException("Already running");
+            this.IsRunning = true;
             this.m_traceSource.TraceInformation("Starting RestService {0}", this.Name);
+
+            var dispatcher = new ServiceDispatcher(this);
+            foreach (var bhvr in this.m_serviceBehaviors)
+                bhvr.ApplyServiceBehavior(this, dispatcher);
 
             // Apply behaviors
             foreach (var ep in this.Endpoints)
@@ -39,8 +59,19 @@ namespace RestSrvr
                 foreach (var op in ep.Operations)
                     foreach (var bhvr in op.Description.Behaviors)
                         bhvr.ApplyOperationBehavior(op, op.Dispatcher);
-                ep.Binding.AttachEndpoint(this, ep);
+                ep.Binding.AttachEndpoint(dispatcher, ep);
             }
+
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Stop()
+        {
+            foreach (var ep in this.Endpoints)
+                ep.Binding.DetachEndpoint(ep);
+            this.IsRunning = false;
         }
 
         /// <summary>
@@ -98,6 +129,15 @@ namespace RestSrvr
             this.m_instance = Activator.CreateInstance(behaviorType);
             this.Name = behaviorType.GetCustomAttribute<RestBehaviorAttribute>()?.Name ?? behaviorType.FullName;
         }
-        
+
+        /// <summary>
+        /// Adds a service behavior to this instance
+        /// </summary>
+        public void AddServiceBehavior(IServiceBehavior behavior)
+        {
+            if (this.IsRunning)
+                throw new InvalidOperationException("Cannot add policy when service is running");
+            this.m_serviceBehaviors.Add(behavior);
+        }
     }
 }

@@ -56,7 +56,8 @@
     <Compile Include="Description\OperationDescription.cs" />
     <Compile Include="EndpointOperation.cs" />
     <Compile Include="Exceptions\FaultException.cs" />
-    <Compile Include="IDispatchFormatter.cs" />
+    <Compile Include="IDispatchMessageFormatter.cs" />
+    <Compile Include="IServiceBehavior.cs" />
     <Compile Include="IOperationBehavior.cs" />
     <Compile Include="IEndpointBehavior.cs" />
     <Compile Include="IEndpointBinding.cs" />

@@ -2,13 +2,13 @@
 
 namespace RestSrvr
 {
-    public interface IDispatchFormatter
+    public interface IDispatchMessageFormatter
     {
 
         /// <summary>
         /// Serialize the request 
         /// </summary>
-        void SerializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters);
+        void DeserializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters);
 
         /// <summary>
         /// Serialize the response

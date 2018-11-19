@@ -11,12 +11,12 @@ namespace RestSrvr
     /// <summary>
     /// Default dispatch formatter
     /// </summary>
-    internal class DefaultDispatchFormatter : IDispatchFormatter
+    internal class DefaultDispatchFormatter : IDispatchMessageFormatter
     {
         /// <summary>
         /// Serialize the request for the operation
         /// </summary>
-        public void SerializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters)
+        public void DeserializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters)
         {
 
         }

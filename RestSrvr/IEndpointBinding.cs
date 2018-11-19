@@ -14,6 +14,11 @@ namespace RestSrvr
         /// <summary>
         /// Attach the service context's endpoint to the binding
         /// </summary>
-        void AttachEndpoint(RestService serviceContext, ServiceEndpoint endpoint);
+        void AttachEndpoint(ServiceDispatcher dispatcher, ServiceEndpoint endpoint);
+
+        /// <summary>
+        /// Detach the endpoint
+        /// </summary>
+        void DetachEndpoint(ServiceEndpoint endpoint);
     }
 }
