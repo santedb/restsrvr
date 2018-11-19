@@ -33,7 +33,7 @@ namespace RestSrvr
         /// <summary>
         /// Gets or sets the dispatch formatter
         /// </summary>
-        public IDispatchFormatter DispatchFormatter { get; set; }
+        public IDispatchMessageFormatter DispatchFormatter { get; set; }
 
         /// <summary>
         /// Creats a new operation dispatcher
@@ -127,7 +127,7 @@ namespace RestSrvr
                     parameters[pindex] = sval;
                 }
 
-                this.DispatchFormatter.SerializeRequest(this.m_endpointOperation, requestMessage, parameters);
+                this.DispatchFormatter.DeserializeRequest(this.m_endpointOperation, requestMessage, parameters);
 
                 this.m_traceSource.TraceData(TraceEventType.Verbose, 0, parameters);
 
