@@ -2,7 +2,10 @@
 
 namespace RestSrvr
 {
-    public class EndpointOperation
+    /// <summary>
+    /// Represents a linkage between an endpoint and an operation
+    /// </summary>
+    public sealed class EndpointOperation
     {
         // The desccription of the operation
         private OperationDescription m_description;

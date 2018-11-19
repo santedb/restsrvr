@@ -11,7 +11,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents an endpoint on an HTTP Rest Server
     /// </summary>
-    public class ServiceEndpoint
+    public sealed class ServiceEndpoint
     {
 
         // Description of this endpoint
@@ -44,7 +44,7 @@ namespace RestSrvr
         /// <summary>
         /// Gets the endpoint operations
         /// </summary>
-        public IEnumerable<EndpointOperation> Operations => this.m_operations.AsReadOnly();
+        internal IEnumerable<EndpointOperation> Operations => this.m_operations.AsReadOnly();
 
         /// <summary>
         /// Add an endpoint behavior

@@ -13,7 +13,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a dispatcher that can call / invoke requests
     /// </summary>
-    public class ServiceDispatcher
+    public sealed class ServiceDispatcher
     {
 
         // The service this is applied to
@@ -71,7 +71,7 @@ namespace RestSrvr
 
                 // Find the endpoint 
                 if (ep == null)
-                    throw new FaultException<String>(HttpStatusCode.NotFound, "Specified endpoint not found");
+                    throw new FaultException(404, "Resource not Found");
 
                 return ep.Dispatcher.Dispatch(this, requestMessage, responseMessage);
             }

@@ -17,7 +17,7 @@ namespace RestSrvr
     /// The service dispatcher is responsible for linking the HTTP listener to the
     /// RestService
     /// </summary>
-    public class EndpointDispatcher
+    public sealed class EndpointDispatcher
     {
 
         // Trace source
@@ -50,10 +50,9 @@ namespace RestSrvr
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "EndpointDispatcher.CanDispatch -> {0} (EPRx: {1})", requestMessage.Url, this.m_endpointRegex);
 
             // Match the path
-            if (this.m_endpointRegex.IsMatch(requestMessage.Url.ToString()))
-            {
+            if(this.m_endpointRegex.IsMatch(requestMessage.Url.ToString())) { 
                 requestMessage.OperationPath = this.GetOperationPath(requestMessage.Url);
-                return this.m_serviceEndpoint.Operations.Any(o => o.Dispatcher.CanDispatch(requestMessage));
+                return true;
             }
             else return false;
         }
@@ -74,9 +73,12 @@ namespace RestSrvr
                 foreach (var mfi in this.m_messageInspector)
                     mfi.AfterReceiveRequest(requestMessage);
                 
-                var op = this.m_serviceEndpoint.Operations.FirstOrDefault(o => o.Dispatcher.CanDispatch(requestMessage));
+                var ops = this.m_serviceEndpoint.Operations.Where(o => o.Dispatcher.CanDispatch(requestMessage));
+                if (ops.Count() == 0)
+                    throw new FaultException(404, "Resource not Found");
+                var op = ops.FirstOrDefault(o => requestMessage.Method.ToLowerInvariant() == o.Description.Method.ToLowerInvariant());
                 if (op == null)
-                    throw new FaultException<String>(HttpStatusCode.NotFound, "Specified resource was not found");
+                    throw new FaultException(405, "Method not permitted");
                 op.Dispatcher.Dispatch(serviceDispatcher, requestMessage, responseMessage);
 
                 // Allow message inspectors to inspect before sending response

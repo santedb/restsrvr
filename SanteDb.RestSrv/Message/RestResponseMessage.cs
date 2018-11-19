@@ -75,6 +75,7 @@ namespace RestSrvr.Message
         /// </summary>
         internal void FlushResponseStream()
         {
+            this.m_response.ContentEncoding = Encoding.UTF8;
             this.m_content?.CopyTo(this.m_response.OutputStream);
         }
 

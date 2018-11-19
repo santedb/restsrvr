@@ -10,7 +10,7 @@ namespace RestSrvr.Description
     /// <summary>
     /// Represents a contract description
     /// </summary>
-    public class ContractDescription
+    public sealed class ContractDescription
     {
         // Trace source
         private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);

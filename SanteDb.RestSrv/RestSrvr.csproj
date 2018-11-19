@@ -57,6 +57,7 @@
     <Compile Include="EndpointOperation.cs" />
     <Compile Include="Exceptions\FaultException.cs" />
     <Compile Include="IDispatchFormatter.cs" />
+    <Compile Include="IOperationBehavior.cs" />
     <Compile Include="IEndpointBehavior.cs" />
     <Compile Include="IEndpointBinding.cs" />
     <Compile Include="IMessageInspector.cs" />
@@ -78,6 +79,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ServiceError.html" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

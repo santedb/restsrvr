@@ -11,7 +11,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a rest server thread pool
     /// </summary>
-    public class RestServerThreadPool : IDisposable
+    internal sealed class RestServerThreadPool : IDisposable
     {
 
         // Tracer

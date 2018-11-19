@@ -13,7 +13,7 @@ namespace RestSrvr
         /// <summary>
         /// Serialize the response
         /// </summary>
-        void SerializeResponse(EndpointOperation operation, RestResponseMessage response, object[] parameters, object result);
+        void SerializeResponse(RestResponseMessage response, object[] parameters, object result);
 
     }
 }

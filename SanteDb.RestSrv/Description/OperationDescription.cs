@@ -13,11 +13,12 @@ namespace RestSrvr.Description
     /// <summary>
     /// Represents an operation description
     /// </summary>
-    public class OperationDescription
+    public sealed class OperationDescription
     {
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);
+        private List<IOperationBehavior> m_operationBehaviors = new List<IOperationBehavior>();
 
         /// <summary>
         /// Operation description
@@ -34,6 +35,19 @@ namespace RestSrvr.Description
         }
 
         /// <summary>
+        /// Add an operation behavior to the description
+        /// </summary>
+        public void AddOperationBehavior(IOperationBehavior behavior)
+        {
+            this.m_operationBehaviors.Add(behavior);
+        }
+
+        /// <summary>
+        /// Gets the operation behaviors on this behavior
+        /// </summary>
+        public IEnumerable<IOperationBehavior> Behaviors => this.m_operationBehaviors.AsReadOnly();
+
+        /// <summary>
         /// Invoke the specified method
         /// </summary>
         public MethodInfo InvokeMethod { get; private set; }
@@ -47,6 +61,7 @@ namespace RestSrvr.Description
         /// The template that should be used to invoke the method
         /// </summary>
         public String UriTemplate { get; private set; }
+
 
     }
 }

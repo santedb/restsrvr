@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleLogMessageInspector.cs" />
+    <Compile Include="EndpointConsoleLogBehavior.cs" />
     <Compile Include="ISampleContract.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

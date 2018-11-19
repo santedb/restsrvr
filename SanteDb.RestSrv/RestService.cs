@@ -15,7 +15,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a simple HttpRestServer
     /// </summary>
-    public class RestService
+    public sealed class RestService
     {
 
         // The instance
@@ -30,8 +30,17 @@ namespace RestSrvr
         public void Start()
         {
             this.m_traceSource.TraceInformation("Starting RestService {0}", this.Name);
+
+            // Apply behaviors
             foreach (var ep in this.Endpoints)
+            {
+                foreach (var bhvr in ep.Behaviors)
+                    bhvr.ApplyEndpointBehavior(ep, ep.Dispatcher);
+                foreach (var op in ep.Operations)
+                    foreach (var bhvr in op.Description.Behaviors)
+                        bhvr.ApplyOperationBehavior(op, op.Dispatcher);
                 ep.Binding.AttachEndpoint(this, ep);
+            }
         }
 
         /// <summary>

@@ -10,7 +10,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents the current operation context for the rest service thread
     /// </summary>
-    public class RestOperationContext
+    public sealed class RestOperationContext
     {
         // Current reference for thread
         [ThreadStatic]

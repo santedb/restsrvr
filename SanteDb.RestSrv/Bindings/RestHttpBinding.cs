@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -58,14 +59,27 @@ namespace RestSrvr.Bindings
                         RestServerThreadPool.Current.QueueUserWorkItem((o) =>
                         {
                             var context = accept as HttpListenerContext;
-                            RestOperationContext.Current = new RestOperationContext(context);
-                            var requestMessage = new RestRequestMessage(context.Request);
-                            using (var responseMessage = new RestResponseMessage(context.Response))
+                            try
                             {
-                                this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
-                                responseMessage.FlushResponseStream();
+                                RestOperationContext.Current = new RestOperationContext(context);
+                                var requestMessage = new RestRequestMessage(context.Request);
+                                using (var responseMessage = new RestResponseMessage(context.Response))
+                                {
+                                    this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
+                                    context.Response.ContentLength64 = responseMessage.Body.Length;
+
+                                    if(requestMessage.Method.ToLowerInvariant() != "head")
+                                        responseMessage.FlushResponseStream();
+                                }
                             }
-                            context.Response.Close();
+                            catch(Exception e)
+                            {
+                                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                            }
+                            finally
+                            {
+                                context.Response.Close();
+                            }
                         }, accept);
 
                     }

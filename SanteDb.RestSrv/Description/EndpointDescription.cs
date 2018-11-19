@@ -10,7 +10,7 @@ namespace RestSrvr.Description
     /// <summary>
     /// Describes a single endpoint
     /// </summary>
-    public class EndpointDescription
+    public sealed class EndpointDescription
     {
         // Trace source
         private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);

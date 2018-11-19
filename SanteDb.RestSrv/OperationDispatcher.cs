@@ -12,7 +12,10 @@ using System.Threading.Tasks;
 
 namespace RestSrvr
 {
-    class OperationDispatcher
+    /// <summary>
+    /// Represents a dispatcher that routes messages to a particular method
+    /// </summary>
+    public sealed class OperationDispatcher
     {
 
         private TraceSource m_traceSource = new TraceSource(TraceSources.DispatchTraceSourceName);
@@ -94,8 +97,7 @@ namespace RestSrvr
         {
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "OpertionDispatcher.CanDispatch -> {0} {1} (EPRx: {2}/{3})", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.Method, this.m_dispatchRegex);
 
-            return requestMessage.Method.ToLowerInvariant() == this.m_endpointOperation.Description.Method.ToLowerInvariant()
-               && this.m_dispatchRegex.IsMatch(requestMessage.OperationPath);
+            return this.m_dispatchRegex.IsMatch(requestMessage.OperationPath);
         }
 
         /// <summary>
@@ -131,11 +133,11 @@ namespace RestSrvr
 
                 // Validate parameters
                 if (!Enumerable.SequenceEqual(invoke.GetParameters().Select(o => o.ParameterType), parameters.Select(o => o.GetType())))
-                    throw new FaultException<String>(HttpStatusCode.BadRequest, "Bad Request");
+                    throw new FaultException(400, "Bad Request");
 
                 object result = invoke.Invoke(serviceDispatcher.BehaviorInstance, parameters);
 
-                this.DispatchFormatter.SerializeResponse(this.m_endpointOperation, responseMessage, parameters, result);
+                this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
                 return true;
             }
             catch(TargetInvocationException e)

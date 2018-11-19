@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Service Error</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0px;
+        }
+
+        div.header {
+            width: 100%;
+            background-color: #0026ff;
+            padding: 10px 5px;
+            color: #fff;
+            border-bottom: solid #808080 2px;
+        }
+
+        h1, h2 {
+            margin: 2px;
+            padding: 0px;
+        }
+
+        pre {
+            background-color: #ddd;
+            padding: 4px;
+        }
+
+        p {
+            padding: 4px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Service Error - {status}</h1>
+    </div>
+    <p class="message">{message}</p>
+    <h2>Stack Trace:</h2>
+    <pre>{trace}</pre>
+</body>
+</html>
