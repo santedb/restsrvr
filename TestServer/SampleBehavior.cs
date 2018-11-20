@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace TestServer
 {
 
-    [RestBehavior(Name = "SampleBehavior")]
+    [ServiceBehavior(Name = "SampleBehavior")]
     class SampleBehavior : ISampleContract
     {
         public int Add(int a, int b)

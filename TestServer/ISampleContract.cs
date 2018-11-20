@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace TestServer
 {
 
-    [RestContract(Name = "MySampleRESTContract")]
+    [ServiceContract(Name = "MySampleRESTContract")]
     interface ISampleContract
     {
         [Get("/a")]

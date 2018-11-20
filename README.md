@@ -82,6 +82,7 @@ public interface IMyContract {
 public class MyBehavior : IMyContract {
 
     public Stream Index() {
+        RestOperationContext.Current.OutgoingResponse.ContentType = "text/html";
         return new MemoryStream(Encoding.UTF.GetBytes("<html><body>Hello World!</body></html>"));
     }
 
