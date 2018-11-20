@@ -18,8 +18,10 @@ namespace RestSrvr
     public sealed class RestService
     {
 
-        // The instance
+        // The instance (if singleton)
         private object m_instance;
+        private Type m_serviceType;
+        private ServiceInstanceMode m_serviceMode;
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(TraceSources.TraceSourceName);
@@ -32,6 +34,14 @@ namespace RestSrvr
         /// </summary>
         public IEnumerable<IServiceBehavior> ServiceBehaviors => this.m_serviceBehaviors.AsReadOnly();
 
+        /// <summary>
+        /// Gets the behavior type
+        /// </summary>
+        public Type BehaviorType => this.m_serviceType;
+        /// <summary>
+        /// Gets the instance mode
+        /// </summary>
+        public ServiceInstanceMode InstanceMode => this.m_serviceMode;
         /// <summary>
         /// Get whether the service is running
         /// </summary>
@@ -126,8 +136,14 @@ namespace RestSrvr
         /// </summary>
         public RestService(Type behaviorType)
         {
-            this.m_instance = Activator.CreateInstance(behaviorType);
-            this.Name = behaviorType.GetCustomAttribute<RestBehaviorAttribute>()?.Name ?? behaviorType.FullName;
+            this.m_serviceType = behaviorType;
+            var behaviorAttribute = behaviorType.GetCustomAttribute<ServiceBehaviorAttribute>();
+            this.m_serviceMode = behaviorAttribute?.InstanceMode ?? ServiceInstanceMode.PerCall;
+
+            if(this.m_serviceMode == ServiceInstanceMode.Singleton)
+                this.m_instance = Activator.CreateInstance(behaviorType);
+
+            this.Name = behaviorAttribute?.Name ?? behaviorType.FullName;
         }
 
         /// <summary>

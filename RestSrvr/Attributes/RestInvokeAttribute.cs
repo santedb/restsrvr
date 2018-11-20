@@ -13,12 +13,20 @@ namespace RestSrvr.Attributes
     {
 
         /// <summary>
+        /// Rest invoke 
+        /// </summary>
+        public RestInvokeAttribute()
+        {
+
+        }
+
+        /// <summary>
         /// Creates a new rest invokation attribute
         /// </summary>
         public RestInvokeAttribute(String method, String urlTemplate)
         {
             this.Method = method;
-            this.UrlTemplate = urlTemplate;
+            this.UriTemplate = urlTemplate;
         }
 
         /// <summary>
@@ -29,7 +37,7 @@ namespace RestSrvr.Attributes
         /// <summary>
         /// Gets or sets the URL Template
         /// </summary>
-        public String UrlTemplate { get; set; }
+        public String UriTemplate { get; set; }
 
     }
     

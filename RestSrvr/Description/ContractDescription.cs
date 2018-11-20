@@ -41,7 +41,7 @@ namespace RestSrvr.Description
                 throw new InvalidOperationException("Contract type must be an interface");
 
             // Get the name of the contract
-            this.Name = contractType.GetCustomAttribute<RestContractAttribute>()?.Name ?? contractType.FullName;
+            this.Name = contractType.GetCustomAttribute<ServiceContractAttribute>()?.Name ?? contractType.FullName;
             this.m_operations = contractType.GetRuntimeMethods().Where(m => m.GetCustomAttribute<RestInvokeAttribute>() != null).Select(m => new OperationDescription(m)).ToList();
         }
     }

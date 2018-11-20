@@ -31,7 +31,7 @@ namespace RestSrvr.Description
             if (restAttribute == null)
                 throw new InvalidOperationException($"Method {operationMethod.Name} does not have [RestInvokeAttribute] and cannot be used as an operation");
             this.Method = restAttribute.Method;
-            this.UriTemplate = restAttribute.UrlTemplate;
+            this.UriTemplate = restAttribute.UriTemplate;
         }
 
         /// <summary>

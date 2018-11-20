@@ -135,7 +135,12 @@ namespace RestSrvr
                 if (!Enumerable.SequenceEqual(invoke.GetParameters().Select(o => o.ParameterType), parameters.Select(o => o.GetType())))
                     throw new FaultException(400, "Bad Request");
 
-                object result = invoke.Invoke(serviceDispatcher.BehaviorInstance, parameters);
+                // Gather instance 
+                object instance = serviceDispatcher.Service.Instance;
+                if (serviceDispatcher.Service.InstanceMode == Attributes.ServiceInstanceMode.PerCall)
+                    instance = Activator.CreateInstance(serviceDispatcher.Service.BehaviorType);
+
+                object result = invoke.Invoke(instance, parameters);
 
                 this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
                 return true;

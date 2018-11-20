@@ -43,7 +43,7 @@ namespace RestSrvr
         /// <summary>
         /// Get the behavior instance
         /// </summary>
-        internal object BehaviorInstance => this.m_service.Instance;
+        internal RestService Service => this.m_service;
 
         /// <summary>
         /// Creates a new service dispatcher

@@ -44,8 +44,8 @@
     <Compile Include="Attributes\DeleteAttribute.cs" />
     <Compile Include="Attributes\GetAttribute.cs" />
     <Compile Include="Attributes\PutAttribute.cs" />
-    <Compile Include="Attributes\RestBehaviorAttribute.cs" />
-    <Compile Include="Attributes\RestContractAttribute.cs" />
+    <Compile Include="Attributes\ServiceBehaviorAttribute.cs" />
+    <Compile Include="Attributes\ServiceContractAttribute.cs" />
     <Compile Include="Attributes\RestInvokeAttribute.cs" />
     <Compile Include="Attributes\PostAttribute.cs" />
     <Compile Include="Bindings\RestHttpBinding.cs" />

@@ -7,14 +7,15 @@ using System.Threading.Tasks;
 namespace RestSrvr.Attributes
 {
     /// <summary>
-    /// Represents a rest service behavior
+    /// Represents a REST contract
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
-    public class RestBehaviorAttribute : Attribute
+    [AttributeUsage(AttributeTargets.Interface)]
+    public class ServiceContractAttribute : Attribute
     {
         /// <summary>
-        /// Gets or sets the name of the behavior
+        /// Gets or sets the name of the contract
         /// </summary>
         public String Name { get; set; }
+
     }
 }
