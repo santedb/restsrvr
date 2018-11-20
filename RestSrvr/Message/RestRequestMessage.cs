@@ -71,6 +71,7 @@ namespace RestSrvr.Message
             {
                 this.m_messageContents = new MemoryStream();
                 request.InputStream.CopyTo(this.m_messageContents);
+                this.m_messageContents.Seek(0, SeekOrigin.Begin);
             }
 
             this.m_request = request;

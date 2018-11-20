@@ -80,7 +80,7 @@ namespace RestSrvr
                 // Find the endpoint 
                 if (ep == null)
                     throw new FaultException(404, "Resource not Found");
-
+                RestOperationContext.Current.ServiceEndpoint = ep;
                 return ep.Dispatcher.Dispatch(this, requestMessage, responseMessage);
             }
             catch(Exception e)

@@ -31,6 +31,11 @@ namespace RestSrvr.Description
         public String Name { get; private set; }
 
         /// <summary>
+        /// Gets the type of the contract
+        /// </summary>
+        public Type Type { get; private set; }
+
+        /// <summary>
         /// Create a new contract description from the specified contract
         /// </summary>
         public ContractDescription(Type contractType)
@@ -41,8 +46,9 @@ namespace RestSrvr.Description
                 throw new InvalidOperationException("Contract type must be an interface");
 
             // Get the name of the contract
+            this.Type = contractType;
             this.Name = contractType.GetCustomAttribute<ServiceContractAttribute>()?.Name ?? contractType.FullName;
-            this.m_operations = contractType.GetRuntimeMethods().Where(m => m.GetCustomAttribute<RestInvokeAttribute>() != null).Select(m => new OperationDescription(m)).ToList();
+            this.m_operations = contractType.GetRuntimeMethods().Where(m => m.GetCustomAttribute<RestInvokeAttribute>() != null).Select(m => new OperationDescription(this, m)).ToList();
         }
     }
 }

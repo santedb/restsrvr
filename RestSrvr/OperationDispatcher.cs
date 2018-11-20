@@ -86,6 +86,7 @@ namespace RestSrvr
             }
             regexBuilder.Append("?$");
 
+            this.m_regexGroupNames = this.m_regexGroupNames.Where(o => o != null).ToArray();
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Operation {0} will be bound to {1}", endpointOperation.Description.InvokeMethod, regexBuilder);
             this.m_dispatchRegex = new Regex(regexBuilder.ToString(), RegexOptions.IgnoreCase);
         }

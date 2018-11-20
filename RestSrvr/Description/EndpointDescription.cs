@@ -16,7 +16,8 @@ namespace RestSrvr.Description
         private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);
 
         private ContractDescription m_contract;
-        private String m_listenUri;
+        private String m_rawUrl;
+        private Uri m_listenUri;
 
         /// <summary>
         /// Creates a new endpoint description with the specified base URI and contract
@@ -27,11 +28,12 @@ namespace RestSrvr.Description
             this.m_contract = contract;
 
             if (baseUri.Host == "0.0.0.0")
-                this.m_listenUri = baseUri.ToString().Replace("://0.0.0.0", "://+");
+                this.m_rawUrl = baseUri.ToString().Replace("://0.0.0.0", "://+");
             else 
-                this.m_listenUri = baseUri.ToString();
-            if (!this.m_listenUri.EndsWith("/"))
-                this.m_listenUri += "/";
+                this.m_rawUrl = baseUri.ToString();
+            if (!this.m_rawUrl.EndsWith("/"))
+                this.m_rawUrl += "/";
+            this.m_listenUri = baseUri;
         }
 
         /// <summary>
@@ -51,7 +53,11 @@ namespace RestSrvr.Description
         /// <summary>
         /// The listening URI for the endpoint
         /// </summary>
-        public String ListenUri => this.m_listenUri;
-
+        public Uri ListenUri => this.m_listenUri;
+        
+        /// <summary>
+        /// The listening URI for the endpoint
+        /// </summary>
+        public String RawUrl => this.m_rawUrl;
     }
 }

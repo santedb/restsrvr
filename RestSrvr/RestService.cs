@@ -54,24 +54,34 @@ namespace RestSrvr
         {
             if (this.IsRunning)
                 throw new InvalidOperationException("Already running");
+            else if (this.m_endpoints.Count == 0)
+                throw new InvalidOperationException($"Service {this.Name} has 0 endpoints");
             this.IsRunning = true;
-            this.m_traceSource.TraceInformation("Starting RestService {0}", this.Name);
 
-            var dispatcher = new ServiceDispatcher(this);
-            foreach (var bhvr in this.m_serviceBehaviors)
-                bhvr.ApplyServiceBehavior(this, dispatcher);
-
-            // Apply behaviors
-            foreach (var ep in this.Endpoints)
+            try
             {
-                foreach (var bhvr in ep.Behaviors)
-                    bhvr.ApplyEndpointBehavior(ep, ep.Dispatcher);
-                foreach (var op in ep.Operations)
-                    foreach (var bhvr in op.Description.Behaviors)
-                        bhvr.ApplyOperationBehavior(op, op.Dispatcher);
-                ep.Binding.AttachEndpoint(dispatcher, ep);
-            }
+                this.m_traceSource.TraceInformation("Starting RestService {0}", this.Name);
 
+                var dispatcher = new ServiceDispatcher(this);
+                foreach (var bhvr in this.m_serviceBehaviors)
+                    bhvr.ApplyServiceBehavior(this, dispatcher);
+
+                // Apply behaviors
+                foreach (var ep in this.Endpoints)
+                {
+                    foreach (var bhvr in ep.Behaviors)
+                        bhvr.ApplyEndpointBehavior(ep, ep.Dispatcher);
+                    foreach (var op in ep.Operations)
+                        foreach (var bhvr in op.Description.Behaviors)
+                            bhvr.ApplyOperationBehavior(op, op.Dispatcher);
+                    ep.Binding.AttachEndpoint(dispatcher, ep);
+                }
+            }
+            catch
+            {
+                this.IsRunning = false;
+                throw;
+            }
         }
 
         /// <summary>
@@ -123,10 +133,10 @@ namespace RestSrvr
                 throw new ArgumentNullException(nameof(baseUri));
             else if (contractType == null)
                 throw new ArgumentNullException(nameof(contractType));
-            else if (this.m_endpoints.Any(o => o.Description.ListenUri == baseUri.ToString()))
+            else if (this.m_endpoints.Any(o => o.Description.RawUrl == baseUri.ToString()))
                 throw new InvalidOperationException("Another endpoint has already been registered with this base URI");
-            else if (!contractType.IsAssignableFrom(this.m_instance.GetType()))
-                throw new InvalidOperationException($"{this.m_instance.GetType().FullName} does not implement contract {contractType.FullName}");
+            else if (!contractType.IsAssignableFrom(this.m_serviceType))
+                throw new InvalidOperationException($"{this.m_serviceType.FullName} does not implement contract {contractType.FullName}");
 
             this.m_endpoints.Add(new ServiceEndpoint(new EndpointDescription(baseUri, contractType), binding));
         }

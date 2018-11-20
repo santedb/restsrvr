@@ -40,7 +40,7 @@ namespace RestSrvr.Bindings
             this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
             this.m_httpListener = new HttpListener();
 
-            this.m_httpListener.Prefixes.Add(endpoint.Description.ListenUri);
+            this.m_httpListener.Prefixes.Add(endpoint.Description.RawUrl);
             this.m_serviceDispatcher = serviceDispatcher;
 
             // Instantiate the 
@@ -63,8 +63,6 @@ namespace RestSrvr.Bindings
                                 using (var responseMessage = new RestResponseMessage(context.Response))
                                 {
                                     this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
-                                    context.Response.ContentLength64 = responseMessage.Body.Length;
-
                                     if(requestMessage.Method.ToLowerInvariant() != "head")
                                         responseMessage.FlushResponseStream();
                                 }

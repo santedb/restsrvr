@@ -44,6 +44,7 @@
     <Compile Include="Attributes\DeleteAttribute.cs" />
     <Compile Include="Attributes\GetAttribute.cs" />
     <Compile Include="Attributes\PutAttribute.cs" />
+    <Compile Include="Attributes\ServiceKnownResourceAttribute.cs" />
     <Compile Include="Attributes\ServiceBehaviorAttribute.cs" />
     <Compile Include="Attributes\ServiceContractAttribute.cs" />
     <Compile Include="Attributes\RestInvokeAttribute.cs" />

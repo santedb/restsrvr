@@ -28,6 +28,11 @@ namespace RestSrvr
         }
 
         /// <summary>
+        /// Gets the service of the context
+        /// </summary>
+        public ServiceEndpoint ServiceEndpoint { get; internal set; }
+
+        /// <summary>
         /// Incoming request
         /// </summary>
         public HttpListenerRequest IncomingRequest => this.m_context.Request;

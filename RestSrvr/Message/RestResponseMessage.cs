@@ -76,6 +76,17 @@ namespace RestSrvr.Message
         internal void FlushResponseStream()
         {
             this.m_response.ContentEncoding = Encoding.UTF8;
+
+            if(!this.m_content.CanSeek)
+            {
+                var ms = new MemoryStream();
+
+                this.m_content?.CopyTo(ms);
+                this.m_content?.Dispose();
+                this.m_content = ms;
+            }
+            this.m_response.ContentLength64 = this.m_content?.Length ?? 0;
+
             this.m_content?.CopyTo(this.m_response.OutputStream);
         }
 

@@ -2,7 +2,10 @@
 using Newtonsoft.Json.Converters;
 using RestSrvr.Message;
 using System;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Xml.Serialization;
 
@@ -13,12 +16,78 @@ namespace RestSrvr
     /// </summary>
     internal class DefaultDispatchFormatter : IDispatchMessageFormatter
     {
+
+        // Trace source
+        private TraceSource m_traceSource = new TraceSource(TraceSources.MessageTraceSourceName);
+
         /// <summary>
         /// Serialize the request for the operation
         /// </summary>
         public void DeserializeRequest(EndpointOperation operation, RestRequestMessage request, object[] parameters)
         {
+            try
+            {
+                var httpRequest = RestOperationContext.Current.IncomingRequest;
+                string contentType = httpRequest.Headers["Content-Type"];
 
+                for (int pNumber = 0; pNumber < parameters.Length; pNumber++)
+                {
+                    var parm = operation.Description.InvokeMethod.GetParameters()[pNumber];
+
+                    // Simple parameter
+                    if (parameters[pNumber] != null)
+                    {
+                        continue; // dispatcher already populated
+                    }
+                    // Use XML Serializer
+                    else if (contentType?.StartsWith("application/xml") == true)
+                    {
+                        XmlSerializer serializer = new XmlSerializer(parm.ParameterType);
+                        var requestObject = serializer.Deserialize(request.Body);
+                        parameters[pNumber] = requestObject;
+                    }
+                    else if (contentType?.StartsWith("application/json") == true)
+                    {
+                        using (var sr = new StreamReader(request.Body))
+                        {
+                            JsonSerializer jsz = new JsonSerializer()
+                            {
+                                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                                TypeNameHandling = TypeNameHandling.All
+                            };
+                            jsz.Converters.Add(new StringEnumConverter());
+                            var dserType = parm.ParameterType;
+                            parameters[pNumber] = jsz.Deserialize(sr, dserType);
+                        }
+                    }
+                    else if (contentType == "application/octet-stream")
+                    {
+                        parameters[pNumber] = request.Body;
+                    }
+                    else if (contentType == "application/x-www-urlform-encoded")
+                    {
+                        NameValueCollection nvc = new NameValueCollection();
+                        using (var sr = new StreamReader(request.Body))
+                        {
+                            var ptext = sr.ReadToEnd();
+                            var parms = ptext.Split('&');
+                            foreach (var p in parms)
+                            {
+                                var parmData = p.Split('=');
+                                nvc.Add(WebUtility.UrlDecode(parmData[0]), WebUtility.UrlDecode(parmData[1]));
+                            }
+                        }
+                        parameters[pNumber] = nvc;
+                    }
+                    else if (contentType != null)
+                        throw new InvalidOperationException("Invalid request format");
+                }
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                throw;
+            }
         }
 
         /// <summary>
