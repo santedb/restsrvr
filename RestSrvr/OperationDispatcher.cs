@@ -23,7 +23,7 @@ namespace RestSrvr
         /// <summary>
         /// Represents the operation path regex
         /// </summary>
-        private readonly Regex m_templateParser = new Regex(@"([\w\{\}\*]+)");
+        private readonly Regex m_templateParser = new Regex(@"([\w\{\}\*\.\-_]+)");
 
         // Endpoint operation
         private EndpointOperation m_endpointOperation;

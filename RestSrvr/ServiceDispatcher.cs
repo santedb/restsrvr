@@ -70,9 +70,6 @@ namespace RestSrvr
             try
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin service dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_service.Name);
-                // Apply the policy on the specified context
-                foreach (var pol in this.m_servicePolicies)
-                    pol.Apply(requestMessage);
 
                 // Endpoint 
                 var ep = this.m_service.Endpoints.FirstOrDefault(o => o.Dispatcher.CanDispatch(requestMessage));
@@ -80,7 +77,13 @@ namespace RestSrvr
                 // Find the endpoint 
                 if (ep == null)
                     throw new FaultException(404, "Resource not Found");
+
                 RestOperationContext.Current.ServiceEndpoint = ep;
+
+                // Apply the policy on the specified context
+                foreach (var pol in this.m_servicePolicies)
+                    pol.Apply(requestMessage);
+
                 return ep.Dispatcher.Dispatch(this, requestMessage, responseMessage);
             }
             catch(Exception e)

@@ -63,6 +63,11 @@ namespace RestSrvr.Message
         public string OperationPath { get; internal set; }
 
         /// <summary>
+        /// Gets the User agent
+        /// </summary>
+        public string UserAgent => this.m_request.UserAgent;
+
+        /// <summary>
         /// Initialize the rest message with the contents of the request message
         /// </summary>
         public RestRequestMessage(HttpListenerRequest request)

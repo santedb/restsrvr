@@ -33,6 +33,11 @@ namespace RestSrvr
         public ServiceEndpoint ServiceEndpoint { get; internal set; }
 
         /// <summary>
+        /// Endpoint operation
+        /// </summary>
+        public EndpointOperation EndpointOperation { get; internal set; }
+
+        /// <summary>
         /// Incoming request
         /// </summary>
         public HttpListenerRequest IncomingRequest => this.m_context.Request;

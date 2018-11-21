@@ -75,10 +75,12 @@ namespace RestSrvr
                 
                 var ops = this.m_serviceEndpoint.Operations.Where(o => o.Dispatcher.CanDispatch(requestMessage));
                 if (ops.Count() == 0)
-                    throw new FaultException(404, "Resource not Found");
+                    throw new FaultException(404, $"Resource not Found - {requestMessage.Url.AbsolutePath}");
                 var op = ops.FirstOrDefault(o => requestMessage.Method.ToLowerInvariant() == o.Description.Method.ToLowerInvariant());
                 if (op == null)
                     throw new FaultException(405, "Method not permitted");
+
+                RestOperationContext.Current.EndpointOperation = op;
                 op.Dispatcher.Dispatch(serviceDispatcher, requestMessage, responseMessage);
 
                 // Allow message inspectors to inspect before sending response
@@ -101,7 +103,7 @@ namespace RestSrvr
         {
             var matches = this.m_endpointRegex.Match(requestUrl.ToString());
             if (matches.Success)
-                return requestUrl.ToString().Substring(matches.Groups[1].Value.Length);
+                return requestUrl.ToString().Substring(matches.Groups[1].Value.Length).Split('?')[0];
             else
                 throw new InvalidOperationException("Cannot match this path");
         }

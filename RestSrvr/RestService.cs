@@ -127,7 +127,7 @@ namespace RestSrvr
         /// <summary>
         /// Registers the service behavior <paramref name="contractType"/> at base Uri <paramref name="baseUri"/>
         /// </summary>
-        public void AddServiceEndpoint(Uri baseUri, Type contractType, IEndpointBinding binding)
+        public ServiceEndpoint AddServiceEndpoint(Uri baseUri, Type contractType, IEndpointBinding binding)
         {
             if (baseUri == null)
                 throw new ArgumentNullException(nameof(baseUri));
@@ -138,7 +138,9 @@ namespace RestSrvr
             else if (!contractType.IsAssignableFrom(this.m_serviceType))
                 throw new InvalidOperationException($"{this.m_serviceType.FullName} does not implement contract {contractType.FullName}");
 
-            this.m_endpoints.Add(new ServiceEndpoint(new EndpointDescription(baseUri, contractType), binding));
+            var ep = new ServiceEndpoint(new EndpointDescription(baseUri, contractType), binding);
+            this.m_endpoints.Add(ep);
+            return ep;
         }
         
         /// <summary>

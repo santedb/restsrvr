@@ -84,6 +84,7 @@ namespace RestSrvr.Message
                 this.m_content?.CopyTo(ms);
                 this.m_content?.Dispose();
                 this.m_content = ms;
+                ms.Seek(0, SeekOrigin.Begin);
             }
             this.m_response.ContentLength64 = this.m_content?.Length ?? 0;
 
@@ -103,7 +104,7 @@ namespace RestSrvr.Message
         /// </summary>
         public void Dispose()
         {
-            this.m_content.Dispose();
+            this.m_content?.Dispose();
         }
     }
 }
