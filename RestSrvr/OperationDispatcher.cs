@@ -133,7 +133,7 @@ namespace RestSrvr
                 this.m_traceSource.TraceData(TraceEventType.Verbose, 0, parameters);
 
                 // Validate parameters
-                if (!Enumerable.SequenceEqual(invoke.GetParameters().Select(o => o.ParameterType), parameters.Select(o => o.GetType())))
+                if (!Enumerable.Range(0, invoke.GetParameters().Length).All(o=> parameters[o] == null || invoke.GetParameters()[o].ParameterType.IsAssignableFrom(parameters[o]?.GetType())))
                     throw new FaultException(400, "Bad Request");
 
                 // Gather instance 
