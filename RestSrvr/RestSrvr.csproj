@@ -64,6 +64,7 @@
     <Compile Include="IEndpointBinding.cs" />
     <Compile Include="IMessageInspector.cs" />
     <Compile Include="IServiceErrorHandler.cs" />
+    <Compile Include="IOperationPolicy.cs" />
     <Compile Include="IServicePolicy.cs" />
     <Compile Include="Message\RestResponseMessage.cs" />
     <Compile Include="OperationDispatcher.cs" />

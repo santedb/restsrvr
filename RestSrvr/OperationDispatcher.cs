@@ -29,11 +29,17 @@ namespace RestSrvr
         private EndpointOperation m_endpointOperation;
         private Regex m_dispatchRegex;
         private string[] m_regexGroupNames;
-
+        private List<IOperationPolicy> m_operationPolicies = new List<IOperationPolicy>();
+        
         /// <summary>
         /// Gets or sets the dispatch formatter
         /// </summary>
         public IDispatchMessageFormatter DispatchFormatter { get; set; }
+
+        /// <summary>
+        /// Policies on the operation
+        /// </summary>
+        public IEnumerable<IOperationPolicy> Policies => this.m_operationPolicies.AsReadOnly();
 
         /// <summary>
         /// Creats a new operation dispatcher
@@ -92,6 +98,15 @@ namespace RestSrvr
         }
 
         /// <summary>
+        /// Add the operation policy
+        /// </summary>
+        /// <param name="policy"></param>
+        public void AddOperationPolicy(IOperationPolicy policy)
+        {
+            this.m_operationPolicies.Add(policy);
+        }
+
+        /// <summary>
         /// Determines if the message can be dispatched
         /// </summary>
         internal bool CanDispatch(RestRequestMessage requestMessage)
@@ -110,6 +125,8 @@ namespace RestSrvr
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin operation dispatch of {0} {1} to {2}", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.InvokeMethod);
 
+                foreach (var pol in this.m_operationPolicies)
+                    pol.Apply(this.m_endpointOperation, requestMessage);
                 var invoke = this.m_endpointOperation.Description.InvokeMethod;
                 var parameters = new object[invoke.GetParameters().Length];
 
