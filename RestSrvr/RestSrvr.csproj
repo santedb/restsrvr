@@ -82,6 +82,9 @@
     <EmbeddedResource Include="Resources\ServiceError.html" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\SanteDB.licenseheader">
+      <Link>SanteDB.licenseheader</Link>
+    </None>
     <None Include="RestSrvr.nuspec" />
   </ItemGroup>
   <ItemGroup>
