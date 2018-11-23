@@ -160,7 +160,11 @@ namespace RestSrvr
 
                 object result = invoke.Invoke(instance, parameters);
 
-                this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
+                if (result == null)
+                    responseMessage.StatusCode = 204;
+                else
+                    this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
+
                 return true;
             }
             catch(TargetInvocationException e)
