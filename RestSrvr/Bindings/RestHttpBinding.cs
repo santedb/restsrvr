@@ -42,7 +42,6 @@ namespace RestSrvr.Bindings
 
             this.m_httpListener.Prefixes.Add(endpoint.Description.RawUrl);
             this.m_serviceDispatcher = serviceDispatcher;
-
             // Instantiate the 
             this.m_acceptThread = new Thread(() =>
             {
