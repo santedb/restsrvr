@@ -77,7 +77,12 @@ namespace RestSrvr
             using (var sr = new StreamReader(typeof(DefaultErrorHandler).Assembly.GetManifestResourceStream("RestSrvr.Resources.ServiceError.html")))
             {
                 response.ContentType = "text/html";
-                var errRet = sr.ReadToEnd().Replace("{status}", response.StatusCode.ToString()).Replace("{message}", error.Message).Replace("{trace}", error.StackTrace);
+                var errRet = sr.ReadToEnd().Replace("{status}", response.StatusCode.ToString())
+                    .Replace("{description}", response.StatusDescription)
+                    .Replace("{type}", error.GetType().Name)
+                    .Replace("{message}", error.Message)
+                    .Replace("{details}", error.ToString())
+                    .Replace("{trace}", error.StackTrace);
                 response.Body = new MemoryStream(Encoding.UTF8.GetBytes(errRet));
                 response.ContentType = "text/html";
             }

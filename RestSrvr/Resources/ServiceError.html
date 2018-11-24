@@ -36,10 +36,10 @@
 <body>
 
     <div class="header">
-        <h1>Service Error - {status}</h1>
+        <h1>Service Error - {status} {description}</h1>
     </div>
-    <p class="message">{message}</p>
-    <h2>Stack Trace:</h2>
-    <pre>{trace}</pre>
+    <p class="message">{type} : {message}</p>
+    <h2>Details:</h2>
+    <pre>{details}</pre>
 </body>
 </html>
