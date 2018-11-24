@@ -91,7 +91,7 @@ namespace RestSrvr.Bindings
                             }
                             finally
                             {
-                                context.Response.Close();
+                                RestOperationContext.Current.Dispose();
                             }
                         }, accept);
 
