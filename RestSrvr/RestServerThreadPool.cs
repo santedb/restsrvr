@@ -32,7 +32,7 @@ namespace RestSrvr
     /// </summary>
     internal sealed class RestServerThreadPool : IDisposable
     {
-
+        
         // Tracer
         private TraceSource m_tracer = new TraceSource(TraceSources.ThreadingTraceSourceName);
 
@@ -265,6 +265,7 @@ namespace RestSrvr
         /// </summary>
         private void DoneWorkItem()
         {
+            // Finished invokation
             lock (this.m_threadDoneResetEvent)
             {
                 --this.m_remainingWorkItems;

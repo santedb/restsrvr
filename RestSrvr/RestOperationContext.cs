@@ -29,7 +29,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents the current operation context for the rest service thread
     /// </summary>
-    public sealed class RestOperationContext
+    public sealed class RestOperationContext : IDisposable
     {
         // Current reference for thread
         [ThreadStatic]
@@ -37,6 +37,11 @@ namespace RestSrvr
 
         // Context
         private HttpListenerContext m_context;
+
+        /// <summary>
+        /// Fired when the object is disposed
+        /// </summary>
+        public event EventHandler Disposed;
 
         /// <summary>
         /// Creates a new operation context
@@ -73,6 +78,15 @@ namespace RestSrvr
         {
             get { return m_current; }
             internal set { m_current = value; }
+        }
+
+        /// <summary>
+        /// Close the context 
+        /// </summary>
+        public void Dispose()
+        {
+            this.m_context.Response.Close();
+            this.Disposed?.Invoke(this, EventArgs.Empty);
         }
     }
 }
