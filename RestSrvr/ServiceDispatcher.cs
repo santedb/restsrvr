@@ -23,9 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestSrvr
 {
@@ -101,7 +98,10 @@ namespace RestSrvr
 
                 // Apply the policy on the specified context
                 foreach (var pol in this.m_servicePolicies)
+                {
+                    RestOperationContext.Current.AddAppliedPolicy(pol);
                     pol.Apply(requestMessage);
+                }
 
                 return ep.Dispatcher.Dispatch(this, requestMessage, responseMessage);
             }

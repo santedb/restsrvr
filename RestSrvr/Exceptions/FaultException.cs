@@ -18,11 +18,6 @@
  * Date: 2018-11-19
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestSrvr.Exceptions
 {

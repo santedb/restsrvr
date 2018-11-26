@@ -17,15 +17,11 @@
  * User: justin
  * Date: 2018-11-19
  */
-using System;
-using System.Net.Http;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using RestSrvr.Attributes;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace RestSrvr.Description
 {

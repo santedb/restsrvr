@@ -19,10 +19,7 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestSrvr
 {
@@ -37,6 +34,8 @@ namespace RestSrvr
 
         // Context
         private HttpListenerContext m_context;
+        // Applied policies
+        private List<IServicePolicy> m_appliedPolicies = new List<IServicePolicy>();
 
         /// <summary>
         /// Fired when the object is disposed
@@ -81,12 +80,25 @@ namespace RestSrvr
         }
 
         /// <summary>
+        /// Policies that were applied on the context
+        /// </summary>
+        public IEnumerable<IServicePolicy> AppliedPolicies => this.m_appliedPolicies.AsReadOnly();
+
+        /// <summary>
         /// Close the context 
         /// </summary>
         public void Dispose()
         {
             this.m_context.Response.Close();
             this.Disposed?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Add an applied policy
+        /// </summary>
+        internal void AddAppliedPolicy(IServicePolicy pol)
+        {
+            this.m_appliedPolicies.Add(pol);
         }
     }
 }

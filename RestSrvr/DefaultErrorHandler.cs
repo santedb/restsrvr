@@ -17,16 +17,15 @@
  * User: justin
  * Date: 2018-11-19
  */
+using Newtonsoft.Json;
+using RestSrvr.Exceptions;
+using RestSrvr.Message;
 using System;
 using System.IO;
-using System.Net;
 using System.Reflection;
 using System.Security;
 using System.Text;
 using System.Xml;
-using Newtonsoft.Json;
-using RestSrvr.Exceptions;
-using RestSrvr.Message;
 
 namespace RestSrvr
 {
