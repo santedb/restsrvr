@@ -53,7 +53,10 @@ namespace RestSrvr
         public EndpointDispatcher(ServiceEndpoint serviceEndpoint)
         {
             this.m_serviceEndpoint = serviceEndpoint;
-            this.m_endpointRegex = new Regex($"^({serviceEndpoint.Description.RawUrl.Replace("://+", "://.+?")})/?.*");
+            var rawUrl = serviceEndpoint.Description.RawUrl.Replace("://+", "://.+?");
+            if (rawUrl.EndsWith("/"))
+                rawUrl = rawUrl.Substring(0, rawUrl.Length - 1);
+            this.m_endpointRegex = new Regex($"^({rawUrl.Replace("://+", "://.+?")}/?).*");
         }
 
         /// <summary>
