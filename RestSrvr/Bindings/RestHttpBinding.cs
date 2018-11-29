@@ -116,9 +116,8 @@ namespace RestSrvr.Bindings
         {
             this.m_traceSource?.TraceInformation("Stopping RestHttpBinding services...");
             this.m_httpListener?.Stop();
-            this.m_httpListener.Close();
+            this.m_httpListener?.Close();
             this.m_httpListener = null;
-            this.m_acceptThread.Abort();
         }
     }
 }
