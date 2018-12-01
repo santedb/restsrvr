@@ -58,6 +58,7 @@
     <Compile Include="EndpointOperation.cs" />
     <Compile Include="Exceptions\FaultException.cs" />
     <Compile Include="IDispatchMessageFormatter.cs" />
+    <Compile Include="IRestServiceFactory.cs" />
     <Compile Include="IServiceBehavior.cs" />
     <Compile Include="IOperationBehavior.cs" />
     <Compile Include="IEndpointBehavior.cs" />
