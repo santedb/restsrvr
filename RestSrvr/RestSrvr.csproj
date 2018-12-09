@@ -49,6 +49,7 @@
     <Compile Include="Attributes\ServiceContractAttribute.cs" />
     <Compile Include="Attributes\RestInvokeAttribute.cs" />
     <Compile Include="Attributes\PostAttribute.cs" />
+    <Compile Include="Behaviors\ServiceThrottlingBehavior.cs" />
     <Compile Include="Bindings\RestHttpBinding.cs" />
     <Compile Include="DefaultDispatchFormatter.cs" />
     <Compile Include="DefaultErrorHandler.cs" />

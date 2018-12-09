@@ -43,6 +43,7 @@ namespace RestSrvr.Bindings
         // The service context
         private ServiceDispatcher m_serviceDispatcher;
 
+
         /// <summary>
         /// Attach the specified endpoint to this REST binding
         /// </summary>
