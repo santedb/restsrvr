@@ -53,10 +53,12 @@ namespace RestSrvr
         /// Gets the behavior type
         /// </summary>
         public Type BehaviorType => this.m_serviceType;
+
         /// <summary>
         /// Gets the instance mode
         /// </summary>
         public ServiceInstanceMode InstanceMode => this.m_serviceMode;
+
         /// <summary>
         /// Get whether the service is running
         /// </summary>
