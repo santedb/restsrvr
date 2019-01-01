@@ -83,7 +83,7 @@ namespace RestSrvr
                     {
                         parameters[pNumber] = request.Body;
                     }
-                    else if (contentType == "application/x-www-urlform-encoded")
+                    else if (contentType == "application/x-www-form-urlencoded")
                     {
                         NameValueCollection nvc = new NameValueCollection();
                         using (var sr = new StreamReader(request.Body))

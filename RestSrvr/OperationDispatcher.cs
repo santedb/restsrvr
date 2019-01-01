@@ -84,7 +84,13 @@ namespace RestSrvr
                         switch(ptype.Name.ToLowerInvariant())
                         {
                             case "string":
-                                regexBuilder.Append(@"([A-Za-z0-9_\-%\.]*?)");
+                                if (match.Groups[1].Value.StartsWith("{*")) // match all 
+                                {
+                                    m_regexGroupNames[parmCount-1] ="{" +  m_regexGroupNames[parmCount-1].Substring(2);
+                                    regexBuilder.Append(@"(.*?)");
+                                }
+                                else
+                                    regexBuilder.Append(@"([A-Za-z0-9_\-%\.]*?)");
                                 break;
                             case "int32":
                                 regexBuilder.Append("(\\d*?)");
