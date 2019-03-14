@@ -44,11 +44,13 @@
     <Compile Include="Attributes\DeleteAttribute.cs" />
     <Compile Include="Attributes\GetAttribute.cs" />
     <Compile Include="Attributes\PutAttribute.cs" />
+    <Compile Include="Attributes\ServiceFaultAttribute.cs" />
     <Compile Include="Attributes\ServiceKnownResourceAttribute.cs" />
     <Compile Include="Attributes\ServiceBehaviorAttribute.cs" />
     <Compile Include="Attributes\ServiceContractAttribute.cs" />
     <Compile Include="Attributes\RestInvokeAttribute.cs" />
     <Compile Include="Attributes\PostAttribute.cs" />
+    <Compile Include="Attributes\ServiceContentTypeAttribute.cs" />
     <Compile Include="Behaviors\ServiceThrottlingBehavior.cs" />
     <Compile Include="Bindings\RestHttpBinding.cs" />
     <Compile Include="DefaultDispatchFormatter.cs" />

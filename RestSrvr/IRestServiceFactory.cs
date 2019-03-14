@@ -34,9 +34,9 @@ namespace RestSrvr
         /// <summary>
         /// Create the specified REST service (from configuration)
         /// </summary>
-        /// <param name="serviceType">The service behavior</param>
+        /// <param name="serviceBehaviorType">The service behavior</param>
         /// <returns>The created rest service</returns>
-        RestService CreateService(Type serviceType);
+        RestService CreateService(Type serviceBehaviorType);
 
         /// <summary>
         /// Get service capabilities

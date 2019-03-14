@@ -19,6 +19,7 @@
  */
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using RestSrvr.Message;
 using System;
 using System.Collections.Specialized;
