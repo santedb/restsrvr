@@ -150,6 +150,7 @@ namespace RestSrvr
 
                 foreach (var pol in this.m_operationPolicies)
                     pol.Apply(this.m_endpointOperation, requestMessage);
+
                 var invoke = this.m_endpointOperation.Description.InvokeMethod;
                 var parameters = new object[invoke.GetParameters().Length];
 

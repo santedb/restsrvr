@@ -96,7 +96,7 @@ namespace RestSrvr
                 var op = ops.FirstOrDefault(o => requestMessage.Method.ToLowerInvariant() == o.Description.Method.ToLowerInvariant());
                 if (op == null)
                     throw new FaultException(405, "Method not permitted");
-
+                
                 RestOperationContext.Current.EndpointOperation = op;
                 op.Dispatcher.Dispatch(serviceDispatcher, requestMessage, responseMessage);
 

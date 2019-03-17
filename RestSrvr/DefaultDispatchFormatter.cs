@@ -132,7 +132,8 @@ namespace RestSrvr
                 responseMessage.ContentType = responseMessage.ContentType ?? "text/plain";
                 responseMessage.Body = ms;
             }
-            else if (RestOperationContext.Current.IncomingRequest.Headers["Accept"]?.StartsWith("application/json") == true)
+            else if (RestOperationContext.Current.IncomingRequest.Headers["Accept"]?.StartsWith("application/json") == true ||
+                RestOperationContext.Current.IncomingRequest.Url.AbsolutePath.EndsWith(".json"))
             {
                 // Prepare the serializer
                 JsonSerializer jsz = new JsonSerializer();
