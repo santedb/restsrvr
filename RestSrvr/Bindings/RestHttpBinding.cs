@@ -17,6 +17,7 @@
  * User: justi
  * Date: 2019-1-12
  */
+using RestSrvr.Description;
 using RestSrvr.Message;
 using System;
 using System.Diagnostics;
@@ -32,7 +33,7 @@ namespace RestSrvr.Bindings
     {
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(TraceSources.HttpTraceSourceName);
+        private Tracer m_traceSource = new Tracer(TraceSources.HttpTraceSourceName);
 
         // The thread which accepts connections
         private Thread m_acceptThread;
@@ -52,7 +53,7 @@ namespace RestSrvr.Bindings
             if (this.m_httpListener != null)
                 throw new InvalidOperationException("Cannot attach endpoint to running listener");
 
-            this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
+            this.m_traceSource.TraceEvent(EventLevel.Informational,  "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
             this.m_httpListener = new HttpListener();
 
             this.m_httpListener.Prefixes.Add(endpoint.Description.RawUrl);
@@ -83,7 +84,7 @@ namespace RestSrvr.Bindings
                             }
                             catch(Exception e)
                             {
-                                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                             }
                             finally
                             {
@@ -94,8 +95,8 @@ namespace RestSrvr.Bindings
                     }
                     catch (Exception e)
                     {
-                        this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
-                        this.m_traceSource.TraceEvent(TraceEventType.Critical, e.HResult, "Shutting down listener");
+                        this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
+                        this.m_traceSource.TraceEvent(EventLevel.Critical, e.HResult, "Shutting down listener");
                         this.m_httpListener = null;
                     }
                 }

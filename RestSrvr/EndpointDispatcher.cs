@@ -35,7 +35,7 @@ namespace RestSrvr
     {
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(TraceSources.DispatchTraceSourceName);
+        private Tracer m_traceSource = new Tracer(TraceSources.DispatchTraceSourceName);
 
         // The rest service that is attached to this dispatcher
         private ServiceEndpoint m_serviceEndpoint;
@@ -64,7 +64,7 @@ namespace RestSrvr
         /// </summary>
         internal bool CanDispatch(RestRequestMessage requestMessage)
         {
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "EndpointDispatcher.CanDispatch -> {0} (EPRx: {1})", requestMessage.Url, this.m_endpointRegex);
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "EndpointDispatcher.CanDispatch -> {0} (EPRx: {1})", requestMessage.Url, this.m_endpointRegex);
 
             // Match the path
             if(this.m_endpointRegex.IsMatch(requestMessage.Url.ToString())) { 
@@ -85,7 +85,7 @@ namespace RestSrvr
             try
             {
 
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin endpoint dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_serviceEndpoint.Description.Contract);
+                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Begin endpoint dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_serviceEndpoint.Description.Contract);
 
                 foreach (var mfi in this.m_messageInspector)
                     mfi.AfterReceiveRequest(requestMessage);
@@ -108,7 +108,7 @@ namespace RestSrvr
             }
             catch(Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return serviceDispatcher.HandleFault(e, responseMessage);
             }
         }

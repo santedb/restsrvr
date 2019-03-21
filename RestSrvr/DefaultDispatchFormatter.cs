@@ -20,6 +20,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using RestSrvr.Description;
 using RestSrvr.Message;
 using System;
 using System.Collections.Specialized;
@@ -38,7 +39,7 @@ namespace RestSrvr
     {
 
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(TraceSources.MessageTraceSourceName);
+        private Tracer m_traceSource = new Tracer(TraceSources.MessageTraceSourceName);
 
         /// <summary>
         /// Serialize the request for the operation
@@ -105,7 +106,7 @@ namespace RestSrvr
             }
             catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 throw;
             }
         }

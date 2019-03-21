@@ -17,6 +17,7 @@
  * User: justi
  * Date: 2019-1-12
  */
+using RestSrvr.Description;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
 using System;
@@ -35,7 +36,7 @@ namespace RestSrvr
     public sealed class OperationDispatcher
     {
 
-        private TraceSource m_traceSource = new TraceSource(TraceSources.DispatchTraceSourceName);
+        private Tracer m_traceSource = new Tracer(TraceSources.DispatchTraceSourceName);
 
         /// <summary>
         /// Represents the operation path regex
@@ -116,7 +117,7 @@ namespace RestSrvr
             regexBuilder.Append("?$");
 
             this.m_regexGroupNames = this.m_regexGroupNames.Where(o => o != null).ToArray();
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Operation {0} will be bound to {1}", endpointOperation.Description.InvokeMethod, regexBuilder);
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "Operation {0} will be bound to {1}", endpointOperation.Description.InvokeMethod, regexBuilder);
             this.m_dispatchRegex = new Regex(regexBuilder.ToString(), RegexOptions.IgnoreCase);
         }
 
@@ -134,7 +135,7 @@ namespace RestSrvr
         /// </summary>
         internal bool CanDispatch(RestRequestMessage requestMessage)
         {
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "OpertionDispatcher.CanDispatch -> {0} {1} (EPRx: {2}/{3})", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.Method, this.m_dispatchRegex);
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "OpertionDispatcher.CanDispatch -> {0} {1} (EPRx: {2}/{3})", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.Method, this.m_dispatchRegex);
 
             return this.m_dispatchRegex.IsMatch(requestMessage.OperationPath);
         }
@@ -146,7 +147,7 @@ namespace RestSrvr
         {
             try
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin operation dispatch of {0} {1} to {2}", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.InvokeMethod);
+                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Begin operation dispatch of {0} {1} to {2}", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.InvokeMethod);
 
                 foreach (var pol in this.m_operationPolicies)
                     pol.Apply(this.m_endpointOperation, requestMessage);
@@ -171,7 +172,7 @@ namespace RestSrvr
 
                 this.DispatchFormatter.DeserializeRequest(this.m_endpointOperation, requestMessage, parameters);
 
-                this.m_traceSource.TraceData(TraceEventType.Verbose, 0, parameters);
+                this.m_traceSource.TraceData(EventLevel.Verbose, parameters);
 
                 // Validate parameters
                 if (!Enumerable.Range(0, invoke.GetParameters().Length).All(o=> parameters[o] == null || invoke.GetParameters()[o].ParameterType.IsAssignableFrom(parameters[o]?.GetType())))
@@ -193,12 +194,12 @@ namespace RestSrvr
             }
             catch(TargetInvocationException e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return serviceDispatcher.HandleFault(e.InnerException, responseMessage);
             }
             catch(Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                this.m_traceSource.TraceEvent(EventLevel.Error,  e.ToString());
                 return serviceDispatcher.HandleFault(e, responseMessage);
             }
         }

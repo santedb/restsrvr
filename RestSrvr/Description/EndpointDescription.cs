@@ -28,7 +28,7 @@ namespace RestSrvr.Description
     public sealed class EndpointDescription
     {
         // Trace source
-        private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);
+        private Tracer m_traceSource = new Tracer(TraceSources.DescriptionTraceSourceName);
 
         private ContractDescription m_contract;
         private String m_rawUrl;
@@ -39,7 +39,7 @@ namespace RestSrvr.Description
         /// </summary>
         public EndpointDescription(Uri baseUri, ContractDescription contract)
         {
-            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter EndpointDescription CTOR ({0}, {1})", baseUri, contract);
+            this.m_traceSource.TraceEvent(EventLevel.Verbose, "Enter EndpointDescription CTOR ({0}, {1})", baseUri, contract);
             this.m_contract = contract;
 
             if (baseUri.Host == "0.0.0.0")
