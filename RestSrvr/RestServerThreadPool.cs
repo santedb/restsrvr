@@ -32,7 +32,7 @@ namespace RestSrvr
     {
         
         // Tracer
-        private Tracer m_tracer = new Tracer(TraceSources.ThreadingTraceSourceName);
+        private TraceSource m_tracer = new TraceSource(TraceSources.ThreadingTraceSourceName);
 
         // Number of threads to keep alive
         private int m_concurrencyLevel = System.Environment.ProcessorCount * 4;
@@ -144,7 +144,7 @@ namespace RestSrvr
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "Error queueing work item: {0}", e);
+                this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error queueing work item: {0}", e);
             }
         }
 
@@ -195,7 +195,7 @@ namespace RestSrvr
                     }
                     catch (Exception e)
                     {
-                        this.m_tracer.TraceEvent(EventLevel.Error,  "Error in dispatchloop {0}", e);
+                        this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult,  "Error in dispatchloop {0}", e);
                     }
                 }
                 DoWorkItem(wi);
@@ -242,7 +242,7 @@ namespace RestSrvr
         /// </summary>
         private void DoWorkItem(WorkItem state)
         {
-            this.m_tracer.TraceEvent(EventLevel.Verbose, "Starting task on {0} ---> {1}", Thread.CurrentThread.Name, state.Callback.Target.ToString());
+            this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Starting task on {0} ---> {1}", Thread.CurrentThread.Name, state.Callback.Target.ToString());
             var worker = (WorkItem)state;
             try
             {
@@ -250,7 +250,7 @@ namespace RestSrvr
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "!!!!!! 0118 999 881 999 119 7253 : THREAD DEATH !!!!!!!\r\nUncaught Exception on worker thread: {0}", e);
+                this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult,  "!!!!!! 0118 999 881 999 119 7253 : THREAD DEATH !!!!!!!\r\nUncaught Exception on worker thread: {0}", e);
             }
             finally
             {

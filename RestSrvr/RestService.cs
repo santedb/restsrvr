@@ -39,7 +39,7 @@ namespace RestSrvr
         private ServiceInstanceMode m_serviceMode;
 
         // Trace source
-        private Tracer m_traceSource = new Tracer(TraceSources.TraceSourceName);
+        private TraceSource m_traceSource = new TraceSource(TraceSources.TraceSourceName);
 
         // Service behaviors
         private List<IServiceBehavior> m_serviceBehaviors = new List<IServiceBehavior>();
@@ -77,7 +77,7 @@ namespace RestSrvr
 
             try
             {
-                this.m_traceSource.TraceInfo("Starting RestService {0}", this.Name);
+                this.m_traceSource.TraceInformation("Starting RestService {0}", this.Name);
 
                 var dispatcher = new ServiceDispatcher(this);
                 foreach (var bhvr in this.m_serviceBehaviors)

@@ -33,7 +33,7 @@ namespace RestSrvr.Description
     public sealed class ContractDescription
     {
         // Trace source
-        private Tracer m_traceSource = new Tracer(TraceSources.DescriptionTraceSourceName);
+        private TraceSource m_traceSource = new TraceSource(TraceSources.DescriptionTraceSourceName);
 
         /// <summary>
         /// Operations on the contract
@@ -60,7 +60,7 @@ namespace RestSrvr.Description
         /// </summary>
         public ContractDescription(Type contractType)
         {
-            this.m_traceSource.TraceEvent(EventLevel.Verbose, "Enter ContractDescription CTOR ({0})", contractType);
+            this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter ContractDescription CTOR ({0})", contractType);
 
             if (!contractType.IsInterface)
                 throw new InvalidOperationException("Contract type must be an interface");

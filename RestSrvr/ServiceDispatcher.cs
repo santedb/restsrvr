@@ -36,7 +36,7 @@ namespace RestSrvr
         private RestService m_service;
         private List<IServiceErrorHandler> m_errorHandlers = new List<IServiceErrorHandler>() { new DefaultErrorHandler() };
         private List<IServicePolicy> m_servicePolicies = new List<IServicePolicy>();
-        private Tracer m_traceSource = new Tracer(TraceSources.DispatchTraceSourceName);
+        private TraceSource m_traceSource = new TraceSource(TraceSources.DispatchTraceSourceName);
 
         /// <summary>
         /// Gets or sets the authorization provider
@@ -85,7 +85,7 @@ namespace RestSrvr
         
             try
             {
-                this.m_traceSource.TraceEvent(EventLevel.Verbose, "Begin service dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_service.Name);
+                this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin service dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_service.Name);
 
                 // Endpoint 
                 var ep = this.m_service.Endpoints.FirstOrDefault(o => o.Dispatcher.CanDispatch(requestMessage));
