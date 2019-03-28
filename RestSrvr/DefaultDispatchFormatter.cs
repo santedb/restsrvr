@@ -117,7 +117,7 @@ namespace RestSrvr
         public void SerializeResponse(RestResponseMessage responseMessage, object[] parameters, object result)
         {
             // By default unless Accept is application/json , we always prefer application/xml
-            if(result == null)
+            if(result == null && responseMessage.StatusCode != 304)
             {
                 responseMessage.StatusCode = 204;
             }
