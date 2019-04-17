@@ -23,11 +23,15 @@ using Newtonsoft.Json.Serialization;
 using RestSrvr.Description;
 using RestSrvr.Message;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace RestSrvr
@@ -158,7 +162,39 @@ namespace RestSrvr
                 responseMessage.ContentType = responseMessage.ContentType ?? "application/json";
                 responseMessage.Body = ms;
             }
-            else
+            else if(typeof(ExpandoObject).IsAssignableFrom(result.GetType()) || 
+                typeof(IEnumerable<ExpandoObject>).IsAssignableFrom(result.GetType()))
+            {
+                // Custom serialization for XML of a dynamic
+                if (result.GetType() == typeof(ExpandoObject))
+                    result = new List<ExpandoObject>() { result as ExpandoObject };
+                var ms = new MemoryStream();
+                using (var xw = XmlWriter.Create(ms, new XmlWriterSettings() { CloseOutput = false })) // Write dynamic
+                {
+                    xw.WriteStartElement("ArrayOfDynamic", "http://tempuri.org");
+                    // Iterate through objects
+                    foreach(var itm in result as IEnumerable)
+                    {
+                        xw.WriteStartElement("item", "http://tempuri.org");
+                        foreach(var prop in itm as ExpandoObject)
+                        {
+                            xw.WriteStartElement(prop.Key);
+                            if(prop.Value is Guid)
+                                xw.WriteValue(prop.Value.ToString());
+                            else
+                                xw.WriteValue(prop.Value);
+                            xw.WriteEndElement();
+                        }
+                        xw.WriteEndElement();
+                    }
+                    xw.WriteEndElement();
+                }
+
+                ms.Seek(0, SeekOrigin.Begin);
+                responseMessage.ContentType = responseMessage.ContentType ?? "application/xml";
+                responseMessage.Body = ms;
+            }
+            else 
             {
                 var xsz = new XmlSerializer(result.GetType());
                 var ms = new MemoryStream();
