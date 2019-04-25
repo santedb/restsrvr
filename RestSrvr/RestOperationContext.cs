@@ -48,6 +48,7 @@ namespace RestSrvr
         internal RestOperationContext(HttpListenerContext context)
         {
             this.m_context = context;
+            this.Data = new Dictionary<String, Object>();
         }
 
         /// <summary>
@@ -83,6 +84,11 @@ namespace RestSrvr
         /// Policies that were applied on the context
         /// </summary>
         public IEnumerable<IServicePolicy> AppliedPolicies => this.m_appliedPolicies.AsReadOnly();
+
+        /// <summary>
+        /// A series of data element associated with the operation context
+        /// </summary>
+        public IDictionary<String, Object> Data { get; }
 
         /// <summary>
         /// Close the context 
