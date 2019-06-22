@@ -181,7 +181,7 @@ namespace RestSrvr
                             xw.WriteStartElement(prop.Key);
                             if(prop.Value is Guid)
                                 xw.WriteValue(prop.Value.ToString());
-                            else
+                            else if(prop.Value != null)
                                 xw.WriteValue(prop.Value);
                             xw.WriteEndElement();
                         }
