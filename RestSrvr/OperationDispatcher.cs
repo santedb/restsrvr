@@ -185,7 +185,7 @@ namespace RestSrvr
 
                 object result = invoke.Invoke(instance, parameters);
 
-                if (result == null && responseMessage.StatusCode != 304)
+                if (result == null && responseMessage.StatusCode == 0)
                     responseMessage.StatusCode = 204;
                 else
                     this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
