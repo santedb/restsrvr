@@ -1,7 +1,15 @@
 # RestSrvr
 RestSrvr is a lightweight replacement for the SanteDB's WCF layer. RestSrvr is used
 by SanteDB services whenever they are run on Linux or environments where WCF 
-service implementation is lacking or does not function (like Mono or Xamarin).
+service implementation is lacking or does not function (like Mono or Xamarin). It also allows for easy deployment and runtime
+operation as no external web-services are required to function (like Apache, NGINX, IIS, etc.) however should hide behind those
+services for production use (for TLS, certificate management, etc.).
+
+The RestSrvr library is primarily designed to also allow easy modification of and inspection of messages, this allows for rapid and easy implementation of :
+
+* Custom operation policies to apply permissions consistently across an entire service
+* Custom serialization and message formatters to support custom wire-level serialization
+* Custom message-logging and inspection
 
 ## Limitations
 RestSrvr currently only supports basic HTTP transmission and routing of RESTful messages.
