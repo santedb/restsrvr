@@ -99,7 +99,7 @@ namespace RestSrvr
         private int m_remainingWorkItems = 1;
         
         // Thread is done reset event
-        private ManualResetEvent m_threadDoneResetEvent = new ManualResetEvent(false);
+        private ManualResetEventSlim m_threadDoneResetEvent = new ManualResetEventSlim(false);
 
         /// <summary>
         /// Queue a work item to be completed
@@ -207,24 +207,24 @@ namespace RestSrvr
         /// Wait until the thread is complete
         /// </summary>
         /// <returns></returns>
-        public bool WaitOne() { return WaitOne(-1, false); }
+        public bool WaitOne() { return WaitOne(-1); }
 
         /// <summary>
         /// Wait until the thread is complete or the specified timeout elapses
         /// </summary>
-        public bool WaitOne(TimeSpan timeout, bool exitContext)
+        public bool WaitOne(TimeSpan timeout)
         {
-            return WaitOne((int)timeout.TotalMilliseconds, exitContext);
+            return WaitOne((int)timeout.TotalMilliseconds);
         }
 
         /// <summary>
         /// Wait until the thread is completed
         /// </summary>
-        public bool WaitOne(int timeout, bool exitContext)
+        public bool WaitOne(int timeout)
         {
             ThrowIfDisposed();
             DoneWorkItem();
-            bool rv = this.m_threadDoneResetEvent.WaitOne(timeout, exitContext);
+            bool rv = this.m_threadDoneResetEvent.Wait(timeout);
             lock (this.m_threadDoneResetEvent)
             {
                 if (rv)
