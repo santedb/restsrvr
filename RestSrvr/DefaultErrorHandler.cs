@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Security;
@@ -49,7 +50,7 @@ namespace RestSrvr
         {
             response.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(error.ToString()));
 
-            if (error is FileNotFoundException)
+            if (error is FileNotFoundException || error is KeyNotFoundException)
                 response.StatusCode = 404;
             else if (error is InvalidOperationException)
                 response.StatusCode = 500;
