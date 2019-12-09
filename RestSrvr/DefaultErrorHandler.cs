@@ -72,6 +72,8 @@ namespace RestSrvr
                     return true;
                 }
             }
+            else
+                response.StatusCode = 500;
 
             // Load the exception screen
             using (var sr = new StreamReader(typeof(DefaultErrorHandler).Assembly.GetManifestResourceStream("RestSrvr.Resources.ServiceError.html")))
