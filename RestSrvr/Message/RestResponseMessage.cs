@@ -93,7 +93,7 @@ namespace RestSrvr.Message
         {
             this.m_response.ContentEncoding = Encoding.UTF8;
 
-            if(!this.m_content.CanSeek)
+            if(!this.m_content?.CanSeek == true)
             {
                 var ms = new MemoryStream();
 
