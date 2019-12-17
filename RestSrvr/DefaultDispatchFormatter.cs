@@ -99,6 +99,7 @@ namespace RestSrvr
                             foreach (var p in parms)
                             {
                                 var parmData = p.Split('=');
+                                parmData[1] += new string('=', parmData.Length - 2);
                                 nvc.Add(WebUtility.UrlDecode(parmData[0]), WebUtility.UrlDecode(parmData[1]));
                             }
                         }
@@ -121,9 +122,10 @@ namespace RestSrvr
         public void SerializeResponse(RestResponseMessage responseMessage, object[] parameters, object result)
         {
             // By default unless Accept is application/json , we always prefer application/xml
-            if(result == null && responseMessage.StatusCode != 304)
+            if(result == null)
             {
-                responseMessage.StatusCode = 204;
+                if(responseMessage.StatusCode == 200)
+                    responseMessage.StatusCode = 204;
             }
             else if(result is Stream)
             {
