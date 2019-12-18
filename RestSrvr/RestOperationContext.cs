@@ -48,7 +48,10 @@ namespace RestSrvr
         internal RestOperationContext(HttpListenerContext context)
         {
             this.m_context = context;
-            this.Data = new Dictionary<String, Object>();
+            this.Data = new Dictionary<String, Object>()
+            {
+                { "uuid", Guid.NewGuid() }
+            };
         }
 
         /// <summary>
