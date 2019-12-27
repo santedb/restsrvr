@@ -24,6 +24,7 @@ using RestSrvr.Description;
 using RestSrvr.Message;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -41,6 +42,8 @@ namespace RestSrvr
     /// </summary>
     internal class DefaultDispatchFormatter : IDispatchMessageFormatter
     {
+        // Serializers
+        private ConcurrentDictionary<Type, XmlSerializer> m_serializers = new ConcurrentDictionary<Type, XmlSerializer>();
 
         // Trace source
         private TraceSource m_traceSource = new TraceSource(TraceSources.MessageTraceSourceName);
@@ -67,7 +70,11 @@ namespace RestSrvr
                     // Use XML Serializer
                     else if (contentType?.StartsWith("application/xml") == true)
                     {
-                        XmlSerializer serializer = new XmlSerializer(parm.ParameterType);
+                        if (!this.m_serializers.TryGetValue(parm.ParameterType, out XmlSerializer serializer))
+                        {
+                            serializer = new XmlSerializer(parm.ParameterType);
+                            this.m_serializers.TryAdd(parm.ParameterType, serializer);
+                        }
                         var requestObject = serializer.Deserialize(request.Body);
                         parameters[pNumber] = requestObject;
                     }
@@ -198,9 +205,13 @@ namespace RestSrvr
             }
             else 
             {
-                var xsz = new XmlSerializer(result.GetType());
+                if (!this.m_serializers.TryGetValue(result.GetType(), out XmlSerializer serializer))
+                {
+                    serializer = new XmlSerializer(result.GetType());
+                    this.m_serializers.TryAdd(result.GetType(), serializer);
+                }
                 var ms = new MemoryStream();
-                xsz.Serialize(ms, result);
+                serializer.Serialize(ms, result);
                 ms.Seek(0, SeekOrigin.Begin);
                 responseMessage.ContentType = responseMessage.ContentType ?? "application/xml";
                 responseMessage.Body = ms;
