@@ -144,7 +144,11 @@ namespace RestSrvr
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error queueing work item: {0}", e);
+                try
+                {
+                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error queueing work item: {0}", e);
+                }
+                catch { }
             }
         }
 
@@ -242,10 +246,10 @@ namespace RestSrvr
         /// </summary>
         private void DoWorkItem(WorkItem state)
         {
-            this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Starting task on {0} ---> {1}", Thread.CurrentThread.Name, state.Callback.Target.ToString());
-            var worker = (WorkItem)state;
             try
             {
+                this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Starting task on {0} ---> {1}", Thread.CurrentThread.Name, state.Callback.Target.ToString());
+                var worker = (WorkItem)state;
                 worker.Callback(worker.State);
             }
             catch (Exception e)
@@ -263,11 +267,22 @@ namespace RestSrvr
         /// </summary>
         private void DoneWorkItem()
         {
-            // Finished invokation
-            lock (this.m_threadDoneResetEvent)
+            try
             {
-                --this.m_remainingWorkItems;
-                if (this.m_remainingWorkItems == 0) this.m_threadDoneResetEvent.Set();
+                // Finished invokation
+                lock (this.m_threadDoneResetEvent)
+                {
+                    --this.m_remainingWorkItems;
+                    if (this.m_remainingWorkItems == 0) this.m_threadDoneResetEvent.Set();
+                }
+            }
+            catch(Exception e)
+            {
+                try
+                {
+                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "!!!!!! ERROR REMOVING ITEM FROM THREAD POOL QUEUE", e);
+                }
+                catch { }
             }
         }
 
