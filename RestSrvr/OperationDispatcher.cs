@@ -17,6 +17,7 @@
  * User: Justin Fyfe
  * Date: 2019-8-8
  */
+using RestSrvr.Attributes;
 using RestSrvr.Description;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
@@ -184,6 +185,11 @@ namespace RestSrvr
                     instance = Activator.CreateInstance(serviceDispatcher.Service.BehaviorType);
 
                 object result = invoke.Invoke(instance, parameters);
+
+                // Does the invoke override content-type?
+                var format = invoke.ReturnParameter.GetCustomAttribute<MessageFormatAttribute>()?.MessageFormat;
+                if (format.HasValue)
+                    responseMessage.Format = format.Value;
 
                 if (result == null && responseMessage.StatusCode == 0)
                     responseMessage.StatusCode = 204;

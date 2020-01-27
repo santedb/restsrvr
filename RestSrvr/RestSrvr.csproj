@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="Attributes\DeleteAttribute.cs" />
     <Compile Include="Attributes\GetAttribute.cs" />
+    <Compile Include="Attributes\MessageFormatAttribute.cs" />
     <Compile Include="Attributes\PutAttribute.cs" />
     <Compile Include="Attributes\ServiceFaultAttribute.cs" />
     <Compile Include="Attributes\ServiceKnownResourceAttribute.cs" />

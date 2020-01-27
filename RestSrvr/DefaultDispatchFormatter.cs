@@ -20,6 +20,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
+using RestSrvr.Attributes;
 using RestSrvr.Description;
 using RestSrvr.Message;
 using System;
@@ -31,6 +32,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -61,6 +63,8 @@ namespace RestSrvr
                 for (int pNumber = 0; pNumber < parameters.Length; pNumber++)
                 {
                     var parm = operation.Description.InvokeMethod.GetParameters()[pNumber];
+                    
+                    // TODO: Look for MessageFormatAttribute for override
 
                     // Simple parameter
                     if (parameters[pNumber] != null)
@@ -146,7 +150,8 @@ namespace RestSrvr
                 responseMessage.ContentType = responseMessage.ContentType ?? "text/plain";
                 responseMessage.Body = ms;
             }
-            else if (RestOperationContext.Current.IncomingRequest.Headers["Accept"]?.StartsWith("application/json") == true ||
+            else if (responseMessage.Format == MessageFormatType.Json ||
+                RestOperationContext.Current.IncomingRequest.Headers["Accept"]?.StartsWith("application/json") == true ||
                 RestOperationContext.Current.IncomingRequest.Url.AbsolutePath.EndsWith(".json"))
             {
                 // Prepare the serializer

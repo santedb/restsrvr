@@ -17,6 +17,7 @@
  * User: Justin Fyfe
  * Date: 2019-8-8
  */
+using RestSrvr.Attributes;
 using System;
 using System.Collections.Specialized;
 using System.IO;
@@ -45,6 +46,12 @@ namespace RestSrvr.Message
         /// Gets or sets teh body to write
         /// </summary>
         public Stream Body { get => this.m_content; set => this.m_content = value; }
+
+        /// <summary>
+        /// Gets or sets the format of this message response type
+        /// </summary>
+        public MessageFormatType Format { get; internal set; }
+
 
         /// <summary>
         /// Gets or sets the content type
