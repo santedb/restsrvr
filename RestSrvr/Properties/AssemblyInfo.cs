@@ -51,4 +51,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.129.0*")]
 [assembly: AssemblyVersion("1.129.0.*")]
 [assembly: AssemblyFileVersion("1.129.0.0")]
-[assembly: AssemblyInformationalVersion("Iqaluit")]
+[assembly: AssemblyInformationalVersion("2.0.0")]
