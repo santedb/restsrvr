@@ -1,18 +1,40 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<!-- <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003"> -->
+  <!-- <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" /> -->
+  <!-- <PropertyGroup> -->
+    <!-- <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration> -->
+    <!-- <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform> -->
+    <!-- <ProjectGuid>{16EF1840-0361-439D-806C-92D0411122EB}</ProjectGuid> -->
+    <!-- <OutputType>Library</OutputType> -->
+    <!-- <AppDesignerFolder>Properties</AppDesignerFolder> -->
+    <!-- <RootNamespace>RestSrvr</RootNamespace> -->
+    <!-- <AssemblyName>RestSrvr</AssemblyName> -->
+    <!-- <TargetFrameworkVersion>v4.7</TargetFrameworkVersion> -->
+    <!-- <FileAlignment>512</FileAlignment> -->
+    <!-- <Deterministic>false</Deterministic> -->
+  <!-- </PropertyGroup> -->
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{16EF1840-0361-439D-806C-92D0411122EB}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RestSrvr</RootNamespace>
-    <AssemblyName>RestSrvr</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <Deterministic>false</Deterministic>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
+    
+  <PropertyGroup>
+    <PackageId>RestSrvr</PackageId>
+    <Title>RestSrvr</Title>
+    <Version>2.0.0</Version>
+    <Description>RestSrvr</Description>
+    <Authors>SanteSuite Contributors</Authors>
+    <PackageTags>SanteDB</PackageTags>
+    <RepositoryUrl>https://github.com/santedb/restsrvr</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IncludeSymbols>true</IncludeSymbols>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	    <Product>SanteDB</Product>
+    <Copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</Copyright>
+    <Company>SanteSuite Contributors</Company>
+  </PropertyGroup>    
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
@@ -32,60 +54,64 @@
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <PackageLicenseExpression>apache2</PackageLicenseExpression>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Attributes\DeleteAttribute.cs" />
-    <Compile Include="Attributes\GetAttribute.cs" />
-    <Compile Include="Attributes\MessageFormatAttribute.cs" />
-    <Compile Include="Attributes\PutAttribute.cs" />
-    <Compile Include="Attributes\ServiceFaultAttribute.cs" />
-    <Compile Include="Attributes\ServiceKnownResourceAttribute.cs" />
-    <Compile Include="Attributes\ServiceBehaviorAttribute.cs" />
-    <Compile Include="Attributes\ServiceContractAttribute.cs" />
-    <Compile Include="Attributes\RestInvokeAttribute.cs" />
-    <Compile Include="Attributes\PostAttribute.cs" />
-    <Compile Include="Attributes\ServiceContentTypeAttribute.cs" />
-    <Compile Include="Behaviors\ServiceThrottlingBehavior.cs" />
-    <Compile Include="Bindings\RestHttpBinding.cs" />
-    <Compile Include="DefaultDispatchFormatter.cs" />
-    <Compile Include="DefaultErrorHandler.cs" />
-    <Compile Include="Description\ContractDescription.cs" />
-    <Compile Include="Description\EndpointDescription.cs" />
-    <Compile Include="Description\OperationDescription.cs" />
-    <Compile Include="EndpointOperation.cs" />
-    <Compile Include="Exceptions\FaultException.cs" />
-    <Compile Include="IDispatchMessageFormatter.cs" />
-    <Compile Include="IRestServiceFactory.cs" />
-    <Compile Include="IServiceBehavior.cs" />
-    <Compile Include="IOperationBehavior.cs" />
-    <Compile Include="IEndpointBehavior.cs" />
-    <Compile Include="IEndpointBinding.cs" />
-    <Compile Include="IMessageInspector.cs" />
-    <Compile Include="IServiceErrorHandler.cs" />
-    <Compile Include="IOperationPolicy.cs" />
-    <Compile Include="IServicePolicy.cs" />
-    <Compile Include="Message\RestResponseMessage.cs" />
-    <Compile Include="OperationDispatcher.cs" />
-    <Compile Include="Message\RestRequestMessage.cs" />
-    <Compile Include="RestServerThreadPool.cs" />
-    <Compile Include="RestService.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EndpointDispatcher.cs" />
-    <Compile Include="TraceSources.cs" />
-    <Compile Include="ServiceDispatcher.cs" />
-    <Compile Include="ServiceEndpoint.cs" />
-    <Compile Include="RestOperationContext.cs" />
-  </ItemGroup>
+   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+  </ItemGroup>         
+  <!-- <ItemGroup> -->
+    <!-- <Reference Include="System" /> -->
+    <!-- <Reference Include="System.Core" /> -->
+    <!-- <Reference Include="System.Xml.Linq" /> -->
+    <!-- <Reference Include="System.Data.DataSetExtensions" /> -->
+    <!-- <Reference Include="Microsoft.CSharp" /> -->
+    <!-- <Reference Include="System.Data" /> -->
+    <!-- <Reference Include="System.Net.Http" /> -->
+    <!-- <Reference Include="System.Xml" /> -->
+  <!-- </ItemGroup> -->
+  <!-- <ItemGroup> -->
+    <!-- <Compile Include="Attributes\DeleteAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\GetAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\MessageFormatAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\PutAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\ServiceFaultAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\ServiceKnownResourceAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\ServiceBehaviorAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\ServiceContractAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\RestInvokeAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\PostAttribute.cs" /> -->
+    <!-- <Compile Include="Attributes\ServiceContentTypeAttribute.cs" /> -->
+    <!-- <Compile Include="Behaviors\ServiceThrottlingBehavior.cs" /> -->
+    <!-- <Compile Include="Bindings\RestHttpBinding.cs" /> -->
+    <!-- <Compile Include="DefaultDispatchFormatter.cs" /> -->
+    <!-- <Compile Include="DefaultErrorHandler.cs" /> -->
+    <!-- <Compile Include="Description\ContractDescription.cs" /> -->
+    <!-- <Compile Include="Description\EndpointDescription.cs" /> -->
+    <!-- <Compile Include="Description\OperationDescription.cs" /> -->
+    <!-- <Compile Include="EndpointOperation.cs" /> -->
+    <!-- <Compile Include="Exceptions\FaultException.cs" /> -->
+    <!-- <Compile Include="IDispatchMessageFormatter.cs" /> -->
+    <!-- <Compile Include="IRestServiceFactory.cs" /> -->
+    <!-- <Compile Include="IServiceBehavior.cs" /> -->
+    <!-- <Compile Include="IOperationBehavior.cs" /> -->
+    <!-- <Compile Include="IEndpointBehavior.cs" /> -->
+    <!-- <Compile Include="IEndpointBinding.cs" /> -->
+    <!-- <Compile Include="IMessageInspector.cs" /> -->
+    <!-- <Compile Include="IServiceErrorHandler.cs" /> -->
+    <!-- <Compile Include="IOperationPolicy.cs" /> -->
+    <!-- <Compile Include="IServicePolicy.cs" /> -->
+    <!-- <Compile Include="Message\RestResponseMessage.cs" /> -->
+    <!-- <Compile Include="OperationDispatcher.cs" /> -->
+    <!-- <Compile Include="Message\RestRequestMessage.cs" /> -->
+    <!-- <Compile Include="RestServerThreadPool.cs" /> -->
+    <!-- <Compile Include="RestService.cs" /> -->
+    <!-- <Compile Include="Properties\AssemblyInfo.cs" /> -->
+    <!-- <Compile Include="EndpointDispatcher.cs" /> -->
+    <!-- <Compile Include="TraceSources.cs" /> -->
+    <!-- <Compile Include="ServiceDispatcher.cs" /> -->
+    <!-- <Compile Include="ServiceEndpoint.cs" /> -->
+    <!-- <Compile Include="RestOperationContext.cs" /> -->
+  <!-- </ItemGroup> -->
   <ItemGroup>
     <EmbeddedResource Include="Resources\ServiceError.html" />
   </ItemGroup>
@@ -93,12 +119,15 @@
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
-    <None Include="RestSrvr.nuspec" />
+    <!-- <None Include="RestSrvr.nuspec" /> -->
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <!-- <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" /> -->
 </Project>
