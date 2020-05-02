@@ -22,7 +22,7 @@
     <PackageId>RestSrvr</PackageId>
     <Title>RestSrvr</Title>
     <Version>2.0.0</Version>
-    <Description>RestSrvr</Description>
+    <Description>The RestSrvr library represents a wrapper around .NET's HTTP API to provide a Windows Communication Foundation (WCF) REST like wrapper allowing for cross platform REST Server implementation used by the rest of SanteDB (Linux, Android, IOS, Windows, etc.)</Description>
     <Authors>SanteSuite Contributors</Authors>
     <PackageTags>SanteDB</PackageTags>
     <RepositoryUrl>https://github.com/santedb/restsrvr</RepositoryUrl>
@@ -34,6 +34,8 @@
 	    <Product>SanteDB</Product>
     <Copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</Copyright>
     <Company>SanteSuite Contributors</Company>
+    <PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
+    <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
   </PropertyGroup>    
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
