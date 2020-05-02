@@ -54,7 +54,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <PackageLicenseExpression>apache2</PackageLicenseExpression>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
    <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
