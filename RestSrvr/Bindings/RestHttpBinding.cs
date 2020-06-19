@@ -54,7 +54,6 @@ namespace RestSrvr.Bindings
 
             this.m_traceSource.TraceEvent(TraceEventType.Information, 0,  "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
             this.m_httpListener = new HttpListener();
-
             this.m_httpListener.Prefixes.Add(endpoint.Description.RawUrl);
             this.m_serviceDispatcher = serviceDispatcher;
             // Instantiate the 
