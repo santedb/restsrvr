@@ -21,7 +21,7 @@
   <PropertyGroup>
     <PackageId>RestSrvr</PackageId>
     <Title>RestSrvr</Title>
-    <Version>2.0.31</Version>
+    <Version>2.0.33</Version>
     <Description>The RestSrvr library represents a wrapper around .NET's HTTP API to provide a Windows Communication Foundation (WCF) REST like wrapper allowing for cross platform REST Server implementation used by the rest of SanteDB (Linux, Android, IOS, Windows, etc.)</Description>
     <Authors>SanteSuite Contributors</Authors>
     <PackageTags>SanteDB</PackageTags>
