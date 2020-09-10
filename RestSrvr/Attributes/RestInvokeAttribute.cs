@@ -23,6 +23,7 @@ namespace RestSrvr.Attributes
     /// <summary>
     /// Indicates that a particular operation can be invoked using HTTP
     /// </summary>
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class RestInvokeAttribute : Attribute
     {
 
