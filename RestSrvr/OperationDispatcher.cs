@@ -195,6 +195,8 @@ namespace RestSrvr
                 else
                     this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
 
+                parameters = null;
+                
                 return true;
             }
             catch(TargetInvocationException e)
