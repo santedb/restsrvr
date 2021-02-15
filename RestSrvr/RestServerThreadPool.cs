@@ -18,6 +18,7 @@
  */
 using RestSrvr.Description;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -29,27 +30,27 @@ namespace RestSrvr
     /// </summary>
     internal sealed class RestServerThreadPool : IDisposable
     {
-        
+
+        // Lock object
+        private static object s_lock = new object();
+
         // Tracer
         private TraceSource m_tracer = new TraceSource(TraceSources.ThreadingTraceSourceName);
 
         // Number of threads to keep alive
-        private int m_concurrencyLevel = System.Environment.ProcessorCount * 4;
-        
+        private int m_concurrencyLevel = System.Environment.ProcessorCount * 8;
+
         // Queue of work items
-        private Queue<WorkItem> m_queue = null;
+        private ConcurrentQueue<WorkItem> m_queue = null;
 
         // Active threads
         private Thread[] m_threadPool = null;
-        // Hint of the number of threads waiting to be executed
-        private int m_threadWait = 0;
+
         // True when the thread pool is being disposed
         private bool m_disposing = false;
 
-        /// <summary>
-        /// Concurrency
-        /// </summary>
-        public int Concurrency { get { return this.m_concurrencyLevel; } }
+        // Object for pulsing
+        private ManualResetEventSlim m_resetEvent = new ManualResetEventSlim(false);
 
         // Get current thread pool
         private static RestServerThreadPool s_current;
@@ -62,7 +63,8 @@ namespace RestSrvr
             get
             {
                 if (s_current == null)
-                    s_current = new RestServerThreadPool();
+                    lock (s_lock) // only want one
+                        s_current = s_current ?? new RestServerThreadPool();
                 return s_current;
             }
         }
@@ -72,7 +74,8 @@ namespace RestSrvr
         /// </summary>
         private RestServerThreadPool()
         {
-            this.m_queue = new Queue<WorkItem>(this.m_concurrencyLevel);
+            this.EnsureStarted(); // Ensure thread pool threads are started
+            this.m_queue = new ConcurrentQueue<WorkItem>();
         }
 
         /// <summary>
@@ -93,12 +96,6 @@ namespace RestSrvr
             /// </summary>
             public ExecutionContext ExecutionContext { get; set; }
         }
-
-        // Number of remaining work items
-        private int m_remainingWorkItems = 1;
-        
-        // Thread is done reset event
-        private ManualResetEventSlim m_threadDoneResetEvent = new ManualResetEventSlim(false);
 
         /// <summary>
         /// Queue a work item to be completed
@@ -131,15 +128,9 @@ namespace RestSrvr
                     State = state,
                     ExecutionContext = ExecutionContext.Capture()
                 };
-                lock (this.m_threadDoneResetEvent) this.m_remainingWorkItems++;
-                this.EnsureStarted(); // Ensure thread pool threads are started
-                lock (m_queue)
-                {
-                    m_queue.Enqueue(wd);
 
-                    if (m_threadWait > 0)
-                        Monitor.Pulse(m_queue);
-                }
+                this.m_queue.Enqueue(wd);
+                this.m_resetEvent.Set();
             }
             catch (Exception e)
             {
@@ -158,19 +149,26 @@ namespace RestSrvr
         {
             if (m_threadPool == null)
             {
-                lock (m_queue)
-                    if (m_threadPool == null)
-                    {
-                        m_threadPool = new Thread[m_concurrencyLevel];
-                        for (int i = 0; i < m_threadPool.Length; i++)
-                        {
-                            m_threadPool[i] = new Thread(DispatchLoop);
-                            m_threadPool[i].Name = String.Format("RSRVR-ThreadPoolThread-{0}", i);
-                            m_threadPool[i].IsBackground = true;
-                            m_threadPool[i].Start();
-                        }
-                    }
+                m_threadPool = new Thread[m_concurrencyLevel];
+                for (int i = 0; i < m_threadPool.Length; i++)
+                {
+                    m_threadPool[i] = this.CreateThreadPoolThread();
+                    m_threadPool[i].Start();
+                }
             }
+        }
+
+        /// <summary>
+        /// Create a thread pool thread
+        /// </summary>
+        private Thread CreateThreadPoolThread()
+        {
+            return new Thread(this.DispatchLoop)
+            {
+                Name = String.Format("RSRVR-ThreadPoolThread"),
+                IsBackground = true,
+                Priority = ThreadPriority.AboveNormal
+            };
         }
 
         /// <summary>
@@ -178,110 +176,21 @@ namespace RestSrvr
         /// </summary>
         private void DispatchLoop()
         {
-            while (true)
-            {
-                WorkItem wi = default(WorkItem);
-                lock (m_queue)
-                {
-                    try
-                    {
-                        if (m_disposing) return; // Shutdown requested
-                        while (m_queue.Count == 0)
-                        {
-                            m_threadWait++;
-                            try { Monitor.Wait(m_queue); }
-                            finally { m_threadWait--; }
-                            if (m_disposing)
-                                return;
-                        }
-                        wi = m_queue.Dequeue();
-                    }
-                    catch (Exception e)
-                    {
-                        this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult,  "Error in dispatchloop {0}", e);
-                    }
-                }
-                DoWorkItem(wi);
-            }
-        }
-
-
-        /// <summary>
-        /// Wait until the thread is complete
-        /// </summary>
-        /// <returns></returns>
-        public bool WaitOne() { return WaitOne(-1); }
-
-        /// <summary>
-        /// Wait until the thread is complete or the specified timeout elapses
-        /// </summary>
-        public bool WaitOne(TimeSpan timeout)
-        {
-            return WaitOne((int)timeout.TotalMilliseconds);
-        }
-
-        /// <summary>
-        /// Wait until the thread is completed
-        /// </summary>
-        public bool WaitOne(int timeout)
-        {
-            ThrowIfDisposed();
-            DoneWorkItem();
-            bool rv = this.m_threadDoneResetEvent.Wait(timeout);
-            lock (this.m_threadDoneResetEvent)
-            {
-                if (rv)
-                {
-                    this.m_remainingWorkItems = 1;
-                    this.m_threadDoneResetEvent.Reset();
-                }
-                else this.m_remainingWorkItems++;
-            }
-            return rv;
-        }
-
-        /// <summary>
-        /// Perform the work if the specified work data
-        /// </summary>
-        private void DoWorkItem(WorkItem state)
-        {
-            try
-            {
-                this.m_tracer.TraceEvent(TraceEventType.Verbose, 0, "Starting task on {0} ---> {1}", Thread.CurrentThread.Name, state.Callback.Target.ToString());
-                var worker = (WorkItem)state;
-                worker.Callback(worker.State);
-            }
-            catch (Exception e)
-            {
-                this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult,  "!!!!!! 0118 999 881 999 119 7253 : THREAD DEATH !!!!!!!\r\nUncaught Exception on worker thread: {0}", e);
-            }
-            finally
-            {
-                DoneWorkItem();
-            }
-        }
-
-        /// <summary>
-        /// Complete a workf item
-        /// </summary>
-        private void DoneWorkItem()
-        {
-            try
-            {
-                // Finished invokation
-                lock (this.m_threadDoneResetEvent)
-                {
-                    --this.m_remainingWorkItems;
-                    if (this.m_remainingWorkItems == 0) this.m_threadDoneResetEvent.Set();
-                }
-            }
-            catch(Exception e)
+            while (!this.m_disposing)
             {
                 try
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "!!!!!! ERROR REMOVING ITEM FROM THREAD POOL QUEUE", e);
+                    this.m_resetEvent.Wait(1000);
+                    while (this.m_queue.TryDequeue(out WorkItem wi))
+                    {
+                        wi.Callback(wi.State);
+                    }
+                    this.m_resetEvent.Reset();
                 }
-                catch { }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error in dispatchloop {0}", e);
+                }
             }
         }
 
@@ -290,7 +199,7 @@ namespace RestSrvr
         /// </summary>
         private void ThrowIfDisposed()
         {
-            if (this.m_threadDoneResetEvent == null) throw new ObjectDisposedException(this.GetType().Name);
+            if (this.m_disposing) throw new ObjectDisposedException(nameof(RestServerThreadPool));
         }
 
         #region IDisposable Members
@@ -300,27 +209,25 @@ namespace RestSrvr
         /// </summary>
         public void Dispose()
         {
-            if (this.m_threadDoneResetEvent != null)
+
+            if (this.m_disposing) return;
+
+            this.m_disposing = true;
+
+            this.m_resetEvent.Set();
+
+            if (m_threadPool != null)
             {
-                if (this.m_remainingWorkItems > 0)
-                    this.WaitOne();
-
-                ((IDisposable)m_threadDoneResetEvent).Dispose();
-                this.m_threadDoneResetEvent = null;
-                m_disposing = true;
-                lock (m_queue)
-                    Monitor.PulseAll(m_queue);
-
-                if (m_threadPool != null)
-                    for (int i = 0; i < m_threadPool.Length; i++)
-                    {
-                        m_threadPool[i].Join();
-                        m_threadPool[i] = null;
-                    }
+                for (int i = 0; i < m_threadPool.Length; i++)
+                {
+                    if (!m_threadPool[i].Join(1000))
+                        m_threadPool[i].Abort();
+                    m_threadPool[i] = null;
+                }
             }
         }
-
-        #endregion
-
     }
+
+    #endregion
+
 }
