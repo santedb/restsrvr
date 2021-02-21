@@ -37,13 +37,10 @@ namespace RestSrvr.Description
         /// <summary>
         /// Operation description
         /// </summary>
-        public OperationDescription(ContractDescription contract, MethodInfo operationMethod)
+        public OperationDescription(ContractDescription contract, MethodInfo operationMethod, RestInvokeAttribute restAttribute)
         {
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter OperationDescription CTOR ({0})", operationMethod);
             this.InvokeMethod = operationMethod;
-            var restAttribute = operationMethod.GetCustomAttribute<RestInvokeAttribute>();
-            if (restAttribute == null)
-                throw new InvalidOperationException($"Method {operationMethod.Name} does not have [RestInvokeAttribute] and cannot be used as an operation");
             this.Method = restAttribute.Method;
             this.UriTemplate = restAttribute.UriTemplate;
             this.Contract = contract;
