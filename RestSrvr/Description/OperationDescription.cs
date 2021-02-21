@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2019 - 2020, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors (See NOTICE.md)
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you 
  * may not use this file except in compliance with the License. You may 
@@ -14,7 +14,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2019-11-27
+ * Date: 2021-2-9
  */
 using RestSrvr.Attributes;
 using System;
@@ -37,13 +37,10 @@ namespace RestSrvr.Description
         /// <summary>
         /// Operation description
         /// </summary>
-        public OperationDescription(ContractDescription contract, MethodInfo operationMethod)
+        public OperationDescription(ContractDescription contract, MethodInfo operationMethod, RestInvokeAttribute restAttribute)
         {
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter OperationDescription CTOR ({0})", operationMethod);
             this.InvokeMethod = operationMethod;
-            var restAttribute = operationMethod.GetCustomAttribute<RestInvokeAttribute>();
-            if (restAttribute == null)
-                throw new InvalidOperationException($"Method {operationMethod.Name} does not have [RestInvokeAttribute] and cannot be used as an operation");
             this.Method = restAttribute.Method;
             this.UriTemplate = restAttribute.UriTemplate;
             this.Contract = contract;
