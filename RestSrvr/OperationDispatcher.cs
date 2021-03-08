@@ -41,7 +41,7 @@ namespace RestSrvr
         /// <summary>
         /// Represents the operation path regex
         /// </summary>
-        private readonly Regex m_templateParser = new Regex(@"([\w\{\}\*\.\-_]+)");
+        private readonly Regex m_templateParser = new Regex(@"([\$\/\\\:\#]|[\w\{\}\*\.\-_]+)");
 
         // Endpoint operation
         private EndpointOperation m_endpointOperation;
@@ -111,10 +111,14 @@ namespace RestSrvr
                         break;
                 }
 
-                regexBuilder.Append("/");
                 match = match.NextMatch();
             }
-            regexBuilder.Append("?$");
+            if (regexBuilder[1] == '/') // starting / is optional
+                regexBuilder.Insert(2, "?");
+            if (regexBuilder[regexBuilder.Length - 1] == '/') // ending with /? is optional
+                regexBuilder.Append("?");
+
+            regexBuilder.Append("$");
 
             this.m_regexGroupNames = this.m_regexGroupNames.Where(o => o != null).ToArray();
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Operation {0} will be bound to {1}", endpointOperation.Description.InvokeMethod, regexBuilder);
