@@ -187,6 +187,10 @@ namespace RestSrvr
                     }
                     this.m_resetEvent.Reset();
                 }
+                catch (ThreadAbortException)
+                {
+                    return;
+                }
                 catch (Exception e)
                 {
                     this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error in dispatchloop {0}", e);

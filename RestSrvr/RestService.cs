@@ -175,6 +175,22 @@ namespace RestSrvr
         }
 
         /// <summary>
+        /// Creates the specified HttpHostContext
+        /// </summary>
+        public RestService(Object behaviorInstance)
+        {
+            this.m_serviceType = behaviorInstance.GetType();
+            var behaviorAttribute = this.m_serviceType.GetCustomAttribute<ServiceBehaviorAttribute>();
+            this.m_serviceMode = behaviorAttribute?.InstanceMode ?? ServiceInstanceMode.PerCall;
+
+            if (this.m_serviceMode == ServiceInstanceMode.Singleton)
+                this.m_instance = behaviorInstance;
+            else
+                throw new InvalidOperationException("Cannot use this constructor with non-singleton services");
+            this.Name = behaviorAttribute?.Name ?? this.m_serviceType.FullName;
+        }
+
+        /// <summary>
         /// Adds a service behavior to this instance
         /// </summary>
         public void AddServiceBehavior(IServiceBehavior behavior)
