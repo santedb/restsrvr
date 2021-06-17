@@ -107,7 +107,7 @@ namespace RestSrvr
                         regexBuilder.Append(".*");
                         break;
                     default:
-                        regexBuilder.Append(match.Groups[1].Value);
+                        regexBuilder.Append(match.Groups[1].Value.Replace("$","\\$"));
                         break;
                 }
 
