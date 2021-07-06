@@ -157,7 +157,7 @@ namespace RestSrvr
                 JsonSerializer jsz = new JsonSerializer();
                 var ms = new MemoryStream();
                 using (var tms = new MemoryStream()) 
-                using (StreamWriter sw = new StreamWriter(tms, Encoding.UTF8))
+                using (StreamWriter sw = new StreamWriter(tms, new UTF8Encoding(false)))
                 using (JsonWriter jsw = new JsonTextWriter(sw))
                 {
                     jsz.DateFormatHandling = DateFormatHandling.IsoDateFormat;
