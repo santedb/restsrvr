@@ -30,6 +30,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Mime;
 using System.Reflection;
@@ -143,7 +144,7 @@ namespace RestSrvr
             ContentType contentType = null;
             if(!String.IsNullOrEmpty(acceptHeader))
             {
-                contentType = new ContentType(acceptHeader);
+                contentType = acceptHeader.Split(',').Select(o => new ContentType(o)).First() ;
             }
 
             // By default unless Accept is application/json , we always prefer application/xml
