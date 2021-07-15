@@ -31,6 +31,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Net;
+using System.Net.Mime;
 using System.Reflection;
 using System.Text;
 using System.Xml;
@@ -57,7 +58,12 @@ namespace RestSrvr
             try
             {
                 var httpRequest = RestOperationContext.Current.IncomingRequest;
-                string contentType = httpRequest.Headers["Content-Type"];
+                string contentTypeHeader = httpRequest.Headers["Content-Type"];
+                ContentType contentType = null;
+                if (!String.IsNullOrEmpty(contentTypeHeader))
+                {
+                    contentType = new ContentType(contentTypeHeader);
+                }
 
                 for (int pNumber = 0; pNumber < parameters.Length; pNumber++)
                 {
@@ -70,53 +76,55 @@ namespace RestSrvr
                     {
                         continue; // dispatcher already populated
                     }
-                    // Use XML Serializer
-                    else if (contentType?.StartsWith("application/xml") == true)
+                    else
                     {
-                        if (!this.m_serializers.TryGetValue(parm.ParameterType, out XmlSerializer serializer))
+                        switch(contentType.MediaType)
                         {
-                            serializer = new XmlSerializer(parm.ParameterType);
-                            this.m_serializers.TryAdd(parm.ParameterType, serializer);
+                            case "application/xml":
+                                if (!this.m_serializers.TryGetValue(parm.ParameterType, out XmlSerializer serializer))
+                                {
+                                    serializer = new XmlSerializer(parm.ParameterType);
+                                    this.m_serializers.TryAdd(parm.ParameterType, serializer);
+                                }
+                                var requestObject = serializer.Deserialize(request.Body);
+                                parameters[pNumber] = requestObject;
+                                break;
+                            case "application/json":
+                                using (var sr = new StreamReader(request.Body))
+                                {
+                                    JsonSerializer jsz = new JsonSerializer()
+                                    {
+                                        TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                                        TypeNameHandling = TypeNameHandling.All
+                                    };
+                                    jsz.Converters.Add(new StringEnumConverter());
+                                    var dserType = parm.ParameterType;
+                                    parameters[pNumber] = jsz.Deserialize(sr, dserType);
+                                }
+                                break;
+                            case "application/octet-stream":
+                                parameters[pNumber] = request.Body;
+                                break;
+                            case "application/x-www-form-urlencoded":
+                                NameValueCollection nvc = new NameValueCollection();
+                                using (var sr = new StreamReader(request.Body))
+                                {
+                                    var ptext = sr.ReadToEnd();
+                                    var parms = ptext.Split('&');
+                                    foreach (var p in parms)
+                                    {
+                                        var parmData = p.Split('=');
+                                        parmData[1] += new string('=', parmData.Length - 2);
+                                        nvc.Add(WebUtility.UrlDecode(parmData[0]), WebUtility.UrlDecode(parmData[1]));
+                                    }
+                                }
+                                parameters[pNumber] = nvc;
+                                break;
+                            default:
+                                throw new InvalidOperationException("Invalid request format");
+
                         }
-                        var requestObject = serializer.Deserialize(request.Body);
-                        parameters[pNumber] = requestObject;
                     }
-                    else if (contentType?.StartsWith("application/json") == true)
-                    {
-                        using (var sr = new StreamReader(request.Body))
-                        {
-                            JsonSerializer jsz = new JsonSerializer()
-                            {
-                                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-                                TypeNameHandling = TypeNameHandling.All
-                            };
-                            jsz.Converters.Add(new StringEnumConverter());
-                            var dserType = parm.ParameterType;
-                            parameters[pNumber] = jsz.Deserialize(sr, dserType);
-                        }
-                    }
-                    else if (contentType == "application/octet-stream")
-                    {
-                        parameters[pNumber] = request.Body;
-                    }
-                    else if (contentType == "application/x-www-form-urlencoded")
-                    {
-                        NameValueCollection nvc = new NameValueCollection();
-                        using (var sr = new StreamReader(request.Body))
-                        {
-                            var ptext = sr.ReadToEnd();
-                            var parms = ptext.Split('&');
-                            foreach (var p in parms)
-                            {
-                                var parmData = p.Split('=');
-                                parmData[1] += new string('=', parmData.Length - 2);
-                                nvc.Add(WebUtility.UrlDecode(parmData[0]), WebUtility.UrlDecode(parmData[1]));
-                            }
-                        }
-                        parameters[pNumber] = nvc;
-                    }
-                    else if (contentType != null)
-                        throw new InvalidOperationException("Invalid request format");
                 }
             }
             catch (Exception e)
@@ -131,32 +139,39 @@ namespace RestSrvr
         /// </summary>
         public void SerializeResponse(RestResponseMessage responseMessage, object[] parameters, object result)
         {
-            // By default unless Accept is application/json , we always prefer application/xml
-            if(result == null)
+            var acceptHeader = RestOperationContext.Current.IncomingRequest.Headers["Accept"];
+            ContentType contentType = null;
+            if(!String.IsNullOrEmpty(acceptHeader))
             {
-                if(responseMessage.StatusCode == 200)
+                contentType = new ContentType(acceptHeader);
+            }
+
+            // By default unless Accept is application/json , we always prefer application/xml
+            if (result == null)
+            {
+                if (responseMessage.StatusCode == 200)
                     responseMessage.StatusCode = 204;
             }
-            else if(result is Stream)
+            else if (result is Stream)
             {
                 responseMessage.ContentType = responseMessage.ContentType ?? "application/octet-stream";
                 responseMessage.Body = result as Stream;
             }
-            else if(result.GetType().IsPrimitive || result is string ||
-                result is Guid) 
+            else if (result.GetType().IsPrimitive || result is string ||
+                result is Guid)
             {
                 var ms = new MemoryStream(Encoding.UTF8.GetBytes(result.ToString()));
                 responseMessage.ContentType = responseMessage.ContentType ?? "text/plain";
                 responseMessage.Body = ms;
             }
             else if (responseMessage.Format == MessageFormatType.Json ||
-                RestOperationContext.Current.IncomingRequest.Headers["Accept"]?.StartsWith("application/json") == true ||
+                contentType?.MediaType == "application/json" ||
                 RestOperationContext.Current.IncomingRequest.Url.AbsolutePath.EndsWith(".json"))
             {
                 // Prepare the serializer
                 JsonSerializer jsz = new JsonSerializer();
                 var ms = new MemoryStream();
-                using (var tms = new MemoryStream()) 
+                using (var tms = new MemoryStream())
                 using (StreamWriter sw = new StreamWriter(tms, new UTF8Encoding(false)))
                 using (JsonWriter jsw = new JsonTextWriter(sw))
                 {
@@ -175,50 +190,59 @@ namespace RestSrvr
                 responseMessage.ContentType = responseMessage.ContentType ?? "application/json";
                 responseMessage.Body = ms;
             }
-            else if(typeof(ExpandoObject).IsAssignableFrom(result.GetType()) || 
-                typeof(IEnumerable<ExpandoObject>).IsAssignableFrom(result.GetType()))
+            else if (responseMessage.Format == MessageFormatType.Xml ||
+                contentType?.MediaType == "application/xml" ||
+                RestOperationContext.Current.IncomingRequest.Url.AbsolutePath.EndsWith(".xml"))
             {
-                // Custom serialization for XML of a dynamic
-                if (result.GetType() == typeof(ExpandoObject))
-                    result = new List<ExpandoObject>() { result as ExpandoObject };
-                var ms = new MemoryStream();
-                using (var xw = XmlWriter.Create(ms, new XmlWriterSettings() { CloseOutput = false })) // Write dynamic
+                if (typeof(ExpandoObject).IsAssignableFrom(result.GetType()) ||
+                    typeof(IEnumerable<ExpandoObject>).IsAssignableFrom(result.GetType()))
                 {
-                    xw.WriteStartElement("ArrayOfDynamic", "http://tempuri.org");
-                    // Iterate through objects
-                    foreach(var itm in result as IEnumerable)
+                    // Custom serialization for XML of a dynamic
+                    if (result.GetType() == typeof(ExpandoObject))
+                        result = new List<ExpandoObject>() { result as ExpandoObject };
+                    var ms = new MemoryStream();
+                    using (var xw = XmlWriter.Create(ms, new XmlWriterSettings() { CloseOutput = false })) // Write dynamic
                     {
-                        xw.WriteStartElement("item", "http://tempuri.org");
-                        foreach(var prop in itm as ExpandoObject)
+                        xw.WriteStartElement("ArrayOfDynamic", "http://tempuri.org");
+                        // Iterate through objects
+                        foreach (var itm in result as IEnumerable)
                         {
-                            xw.WriteStartElement(prop.Key);
-                            if(prop.Value is Guid)
-                                xw.WriteValue(prop.Value.ToString());
-                            else if(prop.Value != null)
-                                xw.WriteValue(prop.Value);
+                            xw.WriteStartElement("item", "http://tempuri.org");
+                            foreach (var prop in itm as ExpandoObject)
+                            {
+                                xw.WriteStartElement(prop.Key);
+                                if (prop.Value is Guid)
+                                    xw.WriteValue(prop.Value.ToString());
+                                else if (prop.Value != null)
+                                    xw.WriteValue(prop.Value);
+                                xw.WriteEndElement();
+                            }
                             xw.WriteEndElement();
                         }
                         xw.WriteEndElement();
                     }
-                    xw.WriteEndElement();
-                }
 
-                ms.Seek(0, SeekOrigin.Begin);
-                responseMessage.ContentType = responseMessage.ContentType ?? "application/xml";
-                responseMessage.Body = ms;
-            }
-            else 
-            {
-                if (!this.m_serializers.TryGetValue(result.GetType(), out XmlSerializer serializer))
-                {
-                    serializer = new XmlSerializer(result.GetType());
-                    this.m_serializers.TryAdd(result.GetType(), serializer);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    responseMessage.ContentType = responseMessage.ContentType ?? "application/xml";
+                    responseMessage.Body = ms;
                 }
-                var ms = new MemoryStream();
-                serializer.Serialize(ms, result);
-                ms.Seek(0, SeekOrigin.Begin);
-                responseMessage.ContentType = responseMessage.ContentType ?? "application/xml";
-                responseMessage.Body = ms;
+                else
+                {
+                    if (!this.m_serializers.TryGetValue(result.GetType(), out XmlSerializer serializer))
+                    {
+                        serializer = new XmlSerializer(result.GetType());
+                        this.m_serializers.TryAdd(result.GetType(), serializer);
+                    }
+                    var ms = new MemoryStream();
+                    serializer.Serialize(ms, result);
+                    ms.Seek(0, SeekOrigin.Begin);
+                    responseMessage.ContentType = responseMessage.ContentType ?? "application/xml";
+                    responseMessage.Body = ms;
+                }
+            }
+            else
+            {
+                throw new ArgumentException($"Unsupported response format requested");
             }
         }
     }
