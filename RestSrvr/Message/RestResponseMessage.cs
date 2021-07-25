@@ -93,6 +93,28 @@ namespace RestSrvr.Message
         }
         
         /// <summary>
+        /// Add authenticate header
+        /// </summary>
+        public void AddAuthenticateHeader(String method, String realm, String error = null, String scope = null, String description = null)
+        {
+            StringBuilder header = new StringBuilder($"{method} realm=\"{realm}\"");
+            if(!String.IsNullOrEmpty(error))
+            {
+                header.AppendFormat(" error=\"{0}\"", error);
+            }
+            if(!string.IsNullOrEmpty(scope))
+            {
+                header.AppendFormat(" scope=\"{0}\"", scope);
+            }
+            if(!String.IsNullOrEmpty(description))
+            {
+                header.AppendFormat(" error_description=\"{0}\"", description);
+            }
+
+            this.m_response.AddHeader("WWW-Authenticate", header.ToString());
+        }
+
+        /// <summary>
         /// Writes the contents to the response
         /// </summary>
         internal void FlushResponseStream()
