@@ -18,6 +18,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -31,6 +32,7 @@ namespace RestSrvr.Behaviors
     /// <summary>
     /// Represents a binding behavior that throttles requests
     /// </summary>
+    [DisplayName("Service Throttling")]
     public class ServiceThrottlingBehavior : IServiceBehavior, IMessageInspector
     {
 
