@@ -29,13 +29,14 @@ namespace RestSrvr.Attributes
     public enum ServiceInstanceMode
     {
         /// <summary>
-        /// New instance is made per call
-        /// </summary>
-        PerCall,
-        /// <summary>
         /// Only one instance is ever created
         /// </summary>
-        Singleton
+        Singleton,
+        /// <summary>
+        /// New instance is made per call
+        /// </summary>
+        PerCall
+        
     }
 
     /// <summary>
