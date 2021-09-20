@@ -51,24 +51,30 @@ namespace RestSrvr
         {
             response.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(error.ToString()));
 
-            if (error is FileNotFoundException || error is KeyNotFoundException)
-                response.StatusCode = 404;
-            else if (error is InvalidOperationException)
-                response.StatusCode = 500;
-            else if (error is XmlException || error is JsonException)
-                response.StatusCode = 400;
-            else if (error is SecurityException || error is UnauthorizedAccessException)
-                response.StatusCode = 401;
-            else if (error is NotSupportedException)
-                response.StatusCode = 405;
-            else if (error is NotImplementedException)
-                response.StatusCode = 501;
-            else if (error is FaultException)
+            var cause = error;
+            while(cause.InnerException != null)
             {
-                response.StatusCode = (error as FaultException).StatusCode;
-                if (error.GetType() != typeof(FaultException)) // Special classification
+                cause = cause.InnerException;
+            }
+
+            if (cause is FileNotFoundException || cause is KeyNotFoundException)
+                response.StatusCode = 404;
+            else if (cause is InvalidOperationException)
+                response.StatusCode = 500;
+            else if (cause is XmlException || cause is JsonException)
+                response.StatusCode = 400;
+            else if (cause is SecurityException || cause is UnauthorizedAccessException)
+                response.StatusCode = 401;
+            else if (cause is NotSupportedException)
+                response.StatusCode = 405;
+            else if (cause is NotImplementedException)
+                response.StatusCode = 501;
+            else if (cause is FaultException)
+            {
+                response.StatusCode = (cause as FaultException).StatusCode;
+                if (cause.GetType() != typeof(FaultException)) // Special classification
                 {
-                    var errorData = error.GetType().GetRuntimeProperty("Body").GetValue(error);
+                    var errorData = error.GetType().GetRuntimeProperty("Body").GetValue(cause);
                     new DefaultDispatchFormatter().SerializeResponse(response, null, errorData);
                     return true;
                 }
