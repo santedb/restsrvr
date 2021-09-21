@@ -19,8 +19,6 @@
  * Date: 2021-8-5
  */
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace RestSrvr.Attributes
 {
@@ -34,7 +32,7 @@ namespace RestSrvr.Attributes
         /// <summary>
         /// Creates a new query parameter attribute
         /// </summary>
-        public UrlParameterAttribute(String name , Type type, String description)
+        public UrlParameterAttribute(String name, Type type, String description)
         {
             this.Name = name;
             this.Type = type;

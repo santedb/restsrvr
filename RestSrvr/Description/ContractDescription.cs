@@ -22,7 +22,6 @@ using RestSrvr.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
 
@@ -69,7 +68,7 @@ namespace RestSrvr.Description
             // Get the name of the contract
             this.Type = contractType;
             this.Name = contractType.GetCustomAttribute<ServiceContractAttribute>()?.Name ?? contractType.FullName;
-            this.m_operations = contractType.GetRuntimeMethods().Where(m => m.GetCustomAttributes<RestInvokeAttribute>().Any()).SelectMany(m => m.GetCustomAttributes<RestInvokeAttribute>().Select(d=> new OperationDescription(this, m, d))).ToList();
+            this.m_operations = contractType.GetRuntimeMethods().Where(m => m.GetCustomAttributes<RestInvokeAttribute>().Any()).SelectMany(m => m.GetCustomAttributes<RestInvokeAttribute>().Select(d => new OperationDescription(this, m, d))).ToList();
         }
     }
 }

@@ -25,7 +25,7 @@ namespace RestSrvr.Attributes
     /// <summary>
     /// Indicates a known rest resource on the rest service 
     /// </summary>
-    [AttributeUsage(AttributeTargets.Interface, AllowMultiple =true)]
+    [AttributeUsage(AttributeTargets.Interface, AllowMultiple = true)]
     public class ServiceKnownResourceAttribute : Attribute
     {
 

@@ -61,7 +61,7 @@ namespace RestSrvr.Exceptions
     public class FaultException<TBody> : FaultException
     {
 
-       
+
         /// <summary>
         /// The body object of the fault
         /// </summary>

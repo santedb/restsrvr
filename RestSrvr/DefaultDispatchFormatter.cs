@@ -20,9 +20,7 @@
  */
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using RestSrvr.Attributes;
-using RestSrvr.Description;
 using RestSrvr.Message;
 using System;
 using System.Collections;
@@ -35,7 +33,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Mime;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -71,7 +68,7 @@ namespace RestSrvr
                 for (int pNumber = 0; pNumber < parameters.Length; pNumber++)
                 {
                     var parm = operation.Description.InvokeMethod.GetParameters()[pNumber];
-                    
+
                     // TODO: Look for MessageFormatAttribute for override
 
                     // Simple parameter
@@ -81,7 +78,7 @@ namespace RestSrvr
                     }
                     else
                     {
-                        switch(contentType.MediaType)
+                        switch (contentType.MediaType)
                         {
                             case "application/xml":
                                 if (!this.m_serializers.TryGetValue(parm.ParameterType, out XmlSerializer serializer))
@@ -144,9 +141,9 @@ namespace RestSrvr
         {
             var acceptHeader = RestOperationContext.Current.IncomingRequest.Headers["Accept"];
             ContentType contentType = null;
-            if(!String.IsNullOrEmpty(acceptHeader))
+            if (!String.IsNullOrEmpty(acceptHeader))
             {
-                contentType = acceptHeader.Split(',').Select(o => new ContentType(o)).First() ;
+                contentType = acceptHeader.Split(',').Select(o => new ContentType(o)).First();
             }
 
             // By default unless Accept is application/json , we always prefer application/xml

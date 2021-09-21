@@ -87,7 +87,7 @@ namespace RestSrvr.Message
         /// </summary>
         public RestRequestMessage(HttpListenerRequest request)
         {
-            if(request.HasEntityBody)
+            if (request.HasEntityBody)
             {
                 this.m_messageContents = new MemoryStream();
                 request.InputStream.CopyTo(this.m_messageContents);

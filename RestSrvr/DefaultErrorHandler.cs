@@ -52,7 +52,7 @@ namespace RestSrvr
             response.Body = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(error.ToString()));
 
             var cause = error;
-            while(cause.InnerException != null)
+            while (cause.InnerException != null)
             {
                 cause = cause.InnerException;
             }

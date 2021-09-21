@@ -68,7 +68,8 @@ namespace RestSrvr
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "EndpointDispatcher.CanDispatch -> {0} (EPRx: {1})", requestMessage.Url, this.m_endpointRegex);
 
             // Match the path
-            if(this.m_endpointRegex.IsMatch(requestMessage.Url.ToString())) { 
+            if (this.m_endpointRegex.IsMatch(requestMessage.Url.ToString()))
+            {
                 requestMessage.OperationPath = this.GetOperationPath(requestMessage.Url);
                 return true;
             }
@@ -90,14 +91,14 @@ namespace RestSrvr
 
                 foreach (var mfi in this.m_messageInspector)
                     mfi.AfterReceiveRequest(requestMessage);
-                
+
                 var ops = this.m_serviceEndpoint.Operations.Where(o => o.Dispatcher.CanDispatch(requestMessage));
                 if (ops.Count() == 0)
                     throw new FaultException(404, $"Resource not Found - {requestMessage.Url.AbsolutePath}");
                 var op = ops.FirstOrDefault(o => requestMessage.Method.ToLowerInvariant() == o.Description.Method.ToLowerInvariant());
                 if (op == null)
                     throw new FaultException(405, "Method not permitted");
-                
+
                 RestOperationContext.Current.EndpointOperation = op;
                 op.Dispatcher.Dispatch(serviceDispatcher, requestMessage, responseMessage);
 
@@ -107,13 +108,13 @@ namespace RestSrvr
 
                 return true;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult,  e.ToString());
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
                 return serviceDispatcher.HandleFault(e, responseMessage);
             }
         }
-        
+
         /// <summary>
         /// Gets the operation path (drops the base URL)
         /// </summary>
