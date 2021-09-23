@@ -37,12 +37,12 @@ namespace RestSrvr.Message
 
         // Response context
         private HttpListenerResponse m_response;
-        
+
         /// <summary>
         /// Gets the headers on the response
         /// </summary>
         public NameValueCollection Headers => this.m_response.Headers;
-        
+
         /// <summary>
         /// Gets or sets teh body to write
         /// </summary>
@@ -93,22 +93,22 @@ namespace RestSrvr.Message
         {
             this.m_response = response;
         }
-        
+
         /// <summary>
         /// Add authenticate header
         /// </summary>
         public void AddAuthenticateHeader(String method, String realm, String error = null, String scope = null, String description = null)
         {
             StringBuilder header = new StringBuilder($"{method} realm=\"{realm}\"");
-            if(!String.IsNullOrEmpty(error))
+            if (!String.IsNullOrEmpty(error))
             {
                 header.AppendFormat(" error=\"{0}\"", error);
             }
-            if(!string.IsNullOrEmpty(scope))
+            if (!string.IsNullOrEmpty(scope))
             {
                 header.AppendFormat(" scope=\"{0}\"", scope);
             }
-            if(!String.IsNullOrEmpty(description))
+            if (!String.IsNullOrEmpty(description))
             {
                 header.AppendFormat(" error_description=\"{0}\"", description);
             }
@@ -123,7 +123,7 @@ namespace RestSrvr.Message
         {
             this.m_response.ContentEncoding = Encoding.UTF8;
 
-            if(!this.m_content?.CanSeek == true)
+            if (!this.m_content?.CanSeek == true)
             {
                 var ms = new MemoryStream();
 

@@ -57,5 +57,5 @@ namespace RestSrvr.Attributes
         public String UriTemplate { get; set; }
 
     }
-    
+
 }

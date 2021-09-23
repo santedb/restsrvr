@@ -19,7 +19,6 @@
  * Date: 2021-8-5
  */
 using RestSrvr.Attributes;
-using RestSrvr.Description;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
 using System;
@@ -50,7 +49,7 @@ namespace RestSrvr
         private Regex m_dispatchRegex;
         private string[] m_regexGroupNames;
         private List<IOperationPolicy> m_operationPolicies = new List<IOperationPolicy>();
-        
+
         /// <summary>
         /// Gets or sets the dispatch formatter
         /// </summary>
@@ -84,12 +83,12 @@ namespace RestSrvr
                         if (parmTypes.Length < parmCount) throw new InvalidOperationException($"REST method accepts {parmTypes.Length} parameters but route specifies more");
                         m_regexGroupNames[parmCount] = match.Groups[1].Value;
                         var ptype = parmTypes[parmCount++];
-                        switch(ptype.Name.ToLowerInvariant())
+                        switch (ptype.Name.ToLowerInvariant())
                         {
                             case "string":
                                 if (match.Groups[1].Value.StartsWith("{*")) // match all 
                                 {
-                                    m_regexGroupNames[parmCount-1] ="{" +  m_regexGroupNames[parmCount-1].Substring(2);
+                                    m_regexGroupNames[parmCount - 1] = "{" + m_regexGroupNames[parmCount - 1].Substring(2);
                                     regexBuilder.Append(@"(.*?)");
                                 }
                                 else
@@ -109,7 +108,7 @@ namespace RestSrvr
                         regexBuilder.Append(".*");
                         break;
                     default:
-                        regexBuilder.Append(match.Groups[1].Value.Replace("$","\\$"));
+                        regexBuilder.Append(match.Groups[1].Value.Replace("$", "\\$"));
                         break;
                 }
 
@@ -163,11 +162,11 @@ namespace RestSrvr
 
                 // By default parameters are passed by name
                 var parmMatch = this.m_dispatchRegex.Match(requestMessage.OperationPath);
-                for(int i = 0; i < this.m_regexGroupNames.Length; i++)
+                for (int i = 0; i < this.m_regexGroupNames.Length; i++)
                 {
                     var pindex = Array.FindIndex(invoke.GetParameters(), o => $"{{{o.Name}}}" == this.m_regexGroupNames[i]);
                     var sparm = invoke.GetParameters()[pindex];
-                    object sval = parmMatch.Groups[i+1].Value;
+                    object sval = parmMatch.Groups[i + 1].Value;
                     if (sparm.ParameterType == typeof(int))
                         sval = Int32.Parse(sval.ToString());
                     else if (sparm.ParameterType == typeof(Guid))
@@ -181,7 +180,7 @@ namespace RestSrvr
                 this.m_traceSource.TraceData(TraceEventType.Verbose, 0, parameters);
 
                 // Validate parameters
-                if (!Enumerable.Range(0, invoke.GetParameters().Length).All(o=> parameters[o] == null || invoke.GetParameters()[o].ParameterType.IsAssignableFrom(parameters[o]?.GetType())))
+                if (!Enumerable.Range(0, invoke.GetParameters().Length).All(o => parameters[o] == null || invoke.GetParameters()[o].ParameterType.IsAssignableFrom(parameters[o]?.GetType())))
                     throw new FaultException(400, "Bad Request");
 
                 // Gather instance 
@@ -202,15 +201,15 @@ namespace RestSrvr
                     this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
 
                 parameters = null;
-                
+
                 return true;
             }
-            catch(TargetInvocationException e)
+            catch (TargetInvocationException e)
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, 0, e.ToString());
                 return serviceDispatcher.HandleFault(e.InnerException, responseMessage);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
                 return serviceDispatcher.HandleFault(e, responseMessage);

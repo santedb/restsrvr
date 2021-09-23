@@ -18,16 +18,13 @@
  * User: fyfej
  * Date: 2021-8-5
  */
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
+using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Xml.Linq;
 
 namespace RestSrvr.Behaviors
 {
@@ -72,7 +69,8 @@ namespace RestSrvr.Behaviors
         public void AfterReceiveRequest(RestRequestMessage request)
         {
             Interlocked.Increment(ref this.m_currentLoad);
-            if (this.m_currentLoad > this.m_maxConcurrency) {
+            if (this.m_currentLoad > this.m_maxConcurrency)
+            {
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Retry-After", "1200");
                 throw new FaultException(429, "Too Many Requests");
             }

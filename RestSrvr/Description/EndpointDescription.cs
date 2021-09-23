@@ -45,7 +45,7 @@ namespace RestSrvr.Description
 
             if (baseUri.Host == "0.0.0.0")
                 this.m_rawUrl = baseUri.ToString().Replace("://0.0.0.0", "://+");
-            else 
+            else
                 this.m_rawUrl = baseUri.ToString();
             if (!this.m_rawUrl.EndsWith("/"))
                 this.m_rawUrl += "/";
@@ -70,7 +70,7 @@ namespace RestSrvr.Description
         /// The listening URI for the endpoint
         /// </summary>
         public Uri ListenUri => this.m_listenUri;
-        
+
         /// <summary>
         /// The listening URI for the endpoint
         /// </summary>

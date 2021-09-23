@@ -74,7 +74,7 @@ namespace RestSrvr
         /// Outgoing resposne
         /// </summary>
         public HttpListenerResponse OutgoingResponse => this.m_context.Response;
-        
+
         /// <summary>
         /// Gets the current operation context
         /// </summary>

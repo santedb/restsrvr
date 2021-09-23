@@ -19,10 +19,6 @@
  * Date: 2021-8-5
  */
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RestSrvr.Attributes
 {
@@ -35,7 +31,7 @@ namespace RestSrvr.Attributes
         /// <summary>
         /// Service consumption attribute
         /// </summary>
-        public ServiceConsumesAttribute(String mimeType) : base (mimeType)
+        public ServiceConsumesAttribute(String mimeType) : base(mimeType)
         {
         }
     }

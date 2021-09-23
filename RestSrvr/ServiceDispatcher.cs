@@ -83,7 +83,7 @@ namespace RestSrvr
         /// </summary>
         internal bool Dispatch(RestRequestMessage requestMessage, RestResponseMessage responseMessage)
         {
-        
+
             try
             {
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin service dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_service.Name);
@@ -106,7 +106,7 @@ namespace RestSrvr
 
                 return ep.Dispatcher.Dispatch(this, requestMessage, responseMessage);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return this.HandleFault(e, responseMessage);
             }

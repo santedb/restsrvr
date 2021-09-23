@@ -32,7 +32,7 @@ namespace RestSrvr
 
         // Description of this endpoint
         private EndpointDescription m_description;
-        private EndpointDispatcher m_dispatcher ;
+        private EndpointDispatcher m_dispatcher;
         private List<IEndpointBehavior> m_behaviors = new List<IEndpointBehavior>();
         private List<EndpointOperation> m_operations = new List<EndpointOperation>();
         private IEndpointBinding m_binding;
@@ -80,6 +80,6 @@ namespace RestSrvr
             this.m_operations = description.Contract.Operations.Select(o => new EndpointOperation(this, o)).ToList();
             this.m_binding = binding;
         }
-        
+
     }
 }

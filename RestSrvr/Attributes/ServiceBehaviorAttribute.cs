@@ -36,7 +36,7 @@ namespace RestSrvr.Attributes
         /// New instance is made per call
         /// </summary>
         PerCall
-        
+
     }
 
     /// <summary>

@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2021-8-5
  */
-using RestSrvr.Description;
 using RestSrvr.Message;
 using System;
 using System.Diagnostics;
@@ -54,7 +53,7 @@ namespace RestSrvr.Bindings
             if (this.m_httpListener != null)
                 throw new InvalidOperationException("Cannot attach endpoint to running listener");
 
-            this.m_traceSource.TraceEvent(TraceEventType.Information, 0,  "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
+            this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
             this.m_httpListener = new HttpListener();
             this.m_httpListener.Prefixes.Add(endpoint.Description.RawUrl);
             this.m_serviceDispatcher = serviceDispatcher;
@@ -78,11 +77,11 @@ namespace RestSrvr.Bindings
                                 using (var responseMessage = new RestResponseMessage(context.Response))
                                 {
                                     this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
-                                    if(requestMessage.Method.ToLowerInvariant() != "head")
+                                    if (requestMessage.Method.ToLowerInvariant() != "head")
                                         responseMessage.FlushResponseStream();
                                 }
                             }
-                            catch(Exception e)
+                            catch (Exception e)
                             {
                                 this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
                             }

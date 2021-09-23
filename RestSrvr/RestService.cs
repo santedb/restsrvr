@@ -63,7 +63,7 @@ namespace RestSrvr
         /// <summary>
         /// Get whether the service is running
         /// </summary>
-        public bool IsRunning { get; private set;  }
+        public bool IsRunning { get; private set; }
 
         /// <summary>
         /// Start this service
@@ -119,7 +119,7 @@ namespace RestSrvr
 
         // Contracts on this rest server
         private List<ServiceEndpoint> m_endpoints = new List<ServiceEndpoint>();
-        
+
         /// <summary>
         /// Gets the endpoints for this rest server host
         /// </summary>
@@ -160,7 +160,7 @@ namespace RestSrvr
             this.m_endpoints.Add(ep);
             return ep;
         }
-        
+
         /// <summary>
         /// Creates the specified HttpHostContext
         /// </summary>
@@ -170,7 +170,7 @@ namespace RestSrvr
             var behaviorAttribute = behaviorType.GetCustomAttribute<ServiceBehaviorAttribute>();
             this.m_serviceMode = behaviorAttribute?.InstanceMode ?? ServiceInstanceMode.PerCall;
 
-            if(this.m_serviceMode == ServiceInstanceMode.Singleton)
+            if (this.m_serviceMode == ServiceInstanceMode.Singleton)
                 this.m_instance = Activator.CreateInstance(behaviorType);
 
             this.Name = behaviorAttribute?.Name ?? behaviorType.FullName;
