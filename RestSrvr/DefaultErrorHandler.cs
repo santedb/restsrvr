@@ -64,7 +64,10 @@ namespace RestSrvr
             else if (cause is XmlException || cause is JsonException)
                 response.StatusCode = 400;
             else if (cause is SecurityException || cause is UnauthorizedAccessException)
+            {
+                response.Headers.Add("WWW-Authenticate", $"realm=\"{RestOperationContext.Current.IncomingRequest.Headers["Host"]}\"");
                 response.StatusCode = 401;
+            }
             else if (cause is NotSupportedException)
                 response.StatusCode = 405;
             else if (cause is NotImplementedException)
