@@ -92,7 +92,7 @@ namespace RestSrvr
                                     regexBuilder.Append(@"(.*?)");
                                 }
                                 else
-                                    regexBuilder.Append(@"([A-Za-z0-9_\-%\.]*?)");
+                                    regexBuilder.Append(@"([A-Za-z0-9_\-%\.\~\\]*?)");
                                 break;
                             case "int32":
                                 regexBuilder.Append("(\\d*?)");
