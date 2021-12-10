@@ -38,7 +38,7 @@ namespace RestSrvr
         private TraceSource m_tracer = new TraceSource(TraceSources.ThreadingTraceSourceName);
 
         // Number of threads to keep alive
-        private int m_concurrencyLevel = System.Environment.ProcessorCount * 8;
+        private int m_concurrencyLevel = System.Environment.ProcessorCount * 16;
 
         // Queue of work items
         private ConcurrentQueue<WorkItem> m_queue = null;
