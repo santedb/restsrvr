@@ -65,7 +65,7 @@ namespace RestSrvr
                 response.StatusCode = 400;
             else if (cause is SecurityException || cause is UnauthorizedAccessException)
             {
-                response.Headers.Add("WWW-Authenticate", $"realm=\"{RestOperationContext.Current.IncomingRequest.Headers["Host"]}\"");
+                response.AddAuthenticateHeader("bearer", RestOperationContext.Current.IncomingRequest.Headers["Host"]);
                 response.StatusCode = 401;
             }
             else if (cause is NotSupportedException)
