@@ -29,16 +29,23 @@ namespace RestSrvr
     /// <summary>
     /// Represents a rest server thread pool
     /// </summary>
-    internal sealed class RestServerThreadPool : IDisposable
+    public sealed class RestServerThreadPool : IDisposable
     {
+
         // Lock object
         private static object s_lock = new object();
+
+        // Maximum concurrency
+        public const string MAX_CONCURRENCY = "RESTSRVR_THREADS_PER_CPU";
+
+        // Last time the thread pool was resized
+        private long m_lastGrowTick = 0;
 
         // Tracer
         private TraceSource m_tracer = new TraceSource(TraceSources.ThreadingTraceSourceName);
 
         // Number of threads to keep alive
-        private int m_concurrencyLevel = System.Environment.ProcessorCount * 16;
+        private readonly int m_maxConcurrencyLevel;
 
         // Queue of work items
         private ConcurrentQueue<WorkItem> m_queue = null;
@@ -54,6 +61,9 @@ namespace RestSrvr
 
         // Get current thread pool
         private static RestServerThreadPool s_current;
+
+        // Busy workers
+        private long m_busyWorkers;
 
         /// <summary>
         /// Get the singleton threadpool
@@ -74,6 +84,14 @@ namespace RestSrvr
         /// </summary>
         private RestServerThreadPool()
         {
+            var envMaxThreads = Environment.GetEnvironmentVariable(MAX_CONCURRENCY);
+            if (!String.IsNullOrEmpty(envMaxThreads) && int.TryParse(envMaxThreads, out var maxThreadsPerCpu))
+            {
+                this.m_maxConcurrencyLevel = Environment.ProcessorCount * maxThreadsPerCpu;
+            }
+            else {
+                this.m_maxConcurrencyLevel = Environment.ProcessorCount * 8;
+            }
             this.EnsureStarted(); // Ensure thread pool threads are started
             this.m_queue = new ConcurrentQueue<WorkItem>();
         }
@@ -132,6 +150,25 @@ namespace RestSrvr
                 };
 
                 this.m_queue.Enqueue(wd);
+
+                // Is there insufficient threads allocated?
+                if(!this.m_queue.IsEmpty && this.m_queue.Count > Environment.ProcessorCount && this.m_threadPool.Length < this.m_maxConcurrencyLevel) // allocate a new thread
+                {
+                    lock (s_lock)
+                    {
+                        if (DateTime.Now.Ticks - this.m_lastGrowTick > TimeSpan.TicksPerSecond * 30) {
+                            var currentSize = this.m_threadPool.Length;
+                            Array.Resize(ref this.m_threadPool, this.m_threadPool.Length + Environment.ProcessorCount); // allocate processor count threads
+                            for (var i = currentSize; i < this.m_threadPool.Length; i++)
+                            {
+                                this.m_threadPool[i] = this.CreateThreadPoolThread();
+                                this.m_threadPool[i].Start();
+
+                            }
+                            this.m_lastGrowTick = DateTime.Now.Ticks;
+                        }
+                    }
+                }
                 this.m_resetEvent.Set();
             }
             catch (Exception e)
@@ -151,7 +188,7 @@ namespace RestSrvr
         {
             if (m_threadPool == null)
             {
-                m_threadPool = new Thread[m_concurrencyLevel];
+                m_threadPool = new Thread[Environment.ProcessorCount * 2];
                 for (int i = 0; i < m_threadPool.Length; i++)
                 {
                     m_threadPool[i] = this.CreateThreadPoolThread();
@@ -185,7 +222,15 @@ namespace RestSrvr
                     this.m_resetEvent.Wait(1000);
                     while (this.m_queue != null && this.m_queue.TryDequeue(out WorkItem wi))
                     {
-                        wi.Callback(wi.State);
+                        try
+                        {
+                            Interlocked.Increment(ref m_busyWorkers);
+                            wi.Callback(wi.State);
+                        }
+                        finally
+                        {
+                            Interlocked.Decrement(ref m_busyWorkers);
+                        }
                     }
                     this.m_resetEvent.Reset();
                 }
@@ -198,6 +243,16 @@ namespace RestSrvr
                     this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error in dispatchloop {0}", e);
                 }
             }
+        }
+
+        /// <summary>
+        /// Get worker status
+        /// </summary>
+        public void GetWorkerStatus(out int totalWorkers, out int availableWorkers, out int waitingQueue)
+        {
+            totalWorkers = this.m_threadPool.Length;
+            availableWorkers = totalWorkers - (int)Interlocked.Read(ref m_busyWorkers);
+            waitingQueue = this.m_queue.Count;
         }
 
         /// <summary>
