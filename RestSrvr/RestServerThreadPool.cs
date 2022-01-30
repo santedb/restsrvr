@@ -47,6 +47,9 @@ namespace RestSrvr
         // Number of threads to keep alive
         private readonly int m_maxConcurrencyLevel;
 
+        // Min pool workers
+        private readonly int m_minPoolWorkers = Environment.ProcessorCount < 4 ? Environment.ProcessorCount * 2 : Environment.ProcessorCount;
+
         // Queue of work items
         private ConcurrentQueue<WorkItem> m_queue = null;
 
@@ -151,24 +154,7 @@ namespace RestSrvr
 
                 this.m_queue.Enqueue(wd);
 
-                // Is there insufficient threads allocated?
-                if(!this.m_queue.IsEmpty && this.m_queue.Count > Environment.ProcessorCount && this.m_threadPool.Length < this.m_maxConcurrencyLevel) // allocate a new thread
-                {
-                    lock (s_lock)
-                    {
-                        if (DateTime.Now.Ticks - this.m_lastGrowTick > TimeSpan.TicksPerSecond * 30) {
-                            var currentSize = this.m_threadPool.Length;
-                            Array.Resize(ref this.m_threadPool, this.m_threadPool.Length + Environment.ProcessorCount); // allocate processor count threads
-                            for (var i = currentSize; i < this.m_threadPool.Length; i++)
-                            {
-                                this.m_threadPool[i] = this.CreateThreadPoolThread();
-                                this.m_threadPool[i].Start();
-
-                            }
-                            this.m_lastGrowTick = DateTime.Now.Ticks;
-                        }
-                    }
-                }
+                this.GrowPoolSize();
                 this.m_resetEvent.Set();
             }
             catch (Exception e)
@@ -181,6 +167,36 @@ namespace RestSrvr
             }
         }
 
+
+        /// <summary>
+        /// Grow the pool if needed
+        /// </summary>
+        private void GrowPoolSize()
+        {
+            if (!this.m_queue.IsEmpty &&  // This method is fast
+                        this.m_queue.Count > Environment.ProcessorCount && // This requires a lock so only do if not empty
+                        this.m_threadPool.Length < this.m_maxConcurrencyLevel) // we have room to allocate new threads
+            {
+                lock (s_lock)
+                {
+                    if (this.m_queue.Count > Environment.ProcessorCount &&
+                        this.m_threadPool.Length < this.m_maxConcurrencyLevel)  // Re-check after lock taken
+                    {
+                        Array.Resize(ref this.m_threadPool, this.m_threadPool.Length + Environment.ProcessorCount); // allocate processor count threads
+                        for (var i = 0; i < this.m_threadPool.Length; i++)
+                        {
+                            if (this.m_threadPool[i] == null)
+                            {
+                                this.m_threadPool[i] = this.CreateThreadPoolThread();
+                                this.m_threadPool[i].Start();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
         /// <summary>
         /// Ensure the thread pool threads are started
         /// </summary>
@@ -188,7 +204,7 @@ namespace RestSrvr
         {
             if (m_threadPool == null)
             {
-                m_threadPool = new Thread[Environment.ProcessorCount * 2];
+                m_threadPool = new Thread[this.m_minPoolWorkers];
                 for (int i = 0; i < m_threadPool.Length; i++)
                 {
                     m_threadPool[i] = this.CreateThreadPoolThread();
@@ -215,21 +231,41 @@ namespace RestSrvr
         /// </summary>
         private void DispatchLoop()
         {
+            long lastActivityJobTime = DateTime.Now.Ticks;
+            int threadPoolIndex = Array.IndexOf(this.m_threadPool, Thread.CurrentThread);
+
             while (!this.m_disposing)
             {
                 try
                 {
-                    this.m_resetEvent.Wait(1000);
-                    while (this.m_queue != null && this.m_queue.TryDequeue(out WorkItem wi))
+                    this.m_resetEvent.Wait(30000);
+
+                    if (threadPoolIndex >= this.m_minPoolWorkers &&
+                        this.m_queue.IsEmpty &&
+                        DateTime.Now.Ticks - lastActivityJobTime > TimeSpan.TicksPerMinute) // shrink the pool
                     {
-                        try
+                        lock (s_lock)
                         {
-                            Interlocked.Increment(ref m_busyWorkers);
-                            wi.Callback(wi.State);
+                            threadPoolIndex = Array.IndexOf(this.m_threadPool, Thread.CurrentThread);
+                            this.m_threadPool[threadPoolIndex] = this.m_threadPool[this.m_threadPool.Length - 1];
+                            Array.Resize(ref this.m_threadPool, this.m_threadPool.Length - 1);
                         }
-                        finally
+                        return;
+                    }
+                    else
+                    {
+                        while (this.m_queue.TryDequeue(out WorkItem wi))
                         {
-                            Interlocked.Decrement(ref m_busyWorkers);
+                            try
+                            {
+                                lastActivityJobTime = DateTime.Now.Ticks;
+                                Interlocked.Increment(ref m_busyWorkers);
+                                wi.Callback(wi.State);
+                            }
+                            finally
+                            {
+                                Interlocked.Decrement(ref m_busyWorkers);
+                            }
                         }
                     }
                     this.m_resetEvent.Reset();
@@ -240,7 +276,6 @@ namespace RestSrvr
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceEvent(TraceEventType.Error, e.HResult, "Error in dispatchloop {0}", e);
                 }
             }
         }
