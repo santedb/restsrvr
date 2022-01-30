@@ -43,15 +43,12 @@ namespace RestSrvr.Bindings
 
         // The service context
         private ServiceDispatcher m_serviceDispatcher;
-        private readonly bool m_useSeparateThreadPool;
 
         /// <summary>
         /// Create the REST HTTP binding 
         /// </summary>
-        /// <param name="useSeparateThreadPool">True if the internal thread pool should be used</param>
-        public RestHttpBinding(bool useSeparateThreadPool)
+        public RestHttpBinding()
         {
-            this.m_useSeparateThreadPool = useSeparateThreadPool;
         }
 
         /// <summary>
@@ -106,14 +103,7 @@ namespace RestSrvr.Bindings
                         var accept = this.m_httpListener.GetContext();
 
                         // Queue work item to run the processing
-                        if(this.m_useSeparateThreadPool)
-                        {
-                            RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
-                        }
-                        else
-                        {
-                            ThreadPool.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
-                        }
+                        RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
 
                     }
                     catch (Exception e)
