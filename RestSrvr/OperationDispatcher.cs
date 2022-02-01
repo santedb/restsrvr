@@ -24,6 +24,7 @@ using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -34,6 +35,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a dispatcher that routes messages to a particular method
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class OperationDispatcher
     {
 

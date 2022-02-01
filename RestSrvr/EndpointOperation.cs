@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
+using System.Diagnostics.CodeAnalysis;
 using RestSrvr.Description;
 
 namespace RestSrvr
@@ -25,6 +27,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a linkage between an endpoint and an operation
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class EndpointOperation
     {
         // The desccription of the operation

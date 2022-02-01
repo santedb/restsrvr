@@ -21,6 +21,7 @@
 using RestSrvr.Attributes;
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Text;
@@ -30,6 +31,7 @@ namespace RestSrvr.Message
     /// <summary>
     /// Represents a response message
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class RestResponseMessage : IDisposable
     {
         // Contents

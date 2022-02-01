@@ -20,6 +20,7 @@
  */
 using System;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 
@@ -28,6 +29,7 @@ namespace RestSrvr.Message
     /// <summary>
     /// Represents a restful message
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class RestRequestMessage
     {
         // Headers of the message

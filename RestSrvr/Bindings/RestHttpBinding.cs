@@ -21,6 +21,7 @@
 using RestSrvr.Message;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 
@@ -29,6 +30,7 @@ namespace RestSrvr.Bindings
     /// <summary>
     /// Represents the binding (HTTP server itself) that actually handles the 
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class RestHttpBinding : IEndpointBinding
     {
 

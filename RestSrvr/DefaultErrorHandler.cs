@@ -23,6 +23,7 @@ using RestSrvr.Exceptions;
 using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
 using System.Security;
@@ -34,6 +35,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents the default error handler
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class DefaultErrorHandler : IServiceErrorHandler
     {
         /// <summary>

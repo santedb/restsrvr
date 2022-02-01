@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace RestSrvr
@@ -28,6 +29,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a rest server thread pool
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class RestServerThreadPool : IDisposable
     {
 

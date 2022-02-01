@@ -23,6 +23,7 @@ using RestSrvr.Description;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -31,6 +32,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a simple HttpRestServer
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class RestService
     {
 

@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -26,6 +27,7 @@ namespace RestSrvr.Attributes
     /// Represents a method can be invoked with PUT
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
+    [ExcludeFromCodeCoverage]
     public class PutAttribute : RestInvokeAttribute
     {
         /// <summary>

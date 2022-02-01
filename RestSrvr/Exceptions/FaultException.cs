@@ -19,12 +19,14 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Exceptions
 {
     /// <summary>
     /// Represents a fault
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class FaultException : Exception
     {
         /// <summary>
@@ -62,6 +64,7 @@ namespace RestSrvr.Exceptions
     /// <summary>
     /// Represents a fault with a type of response body to be sent
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class FaultException<TBody> : FaultException
     {
         /// <summary>

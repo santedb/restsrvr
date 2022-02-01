@@ -22,6 +22,7 @@ using RestSrvr.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace RestSrvr.Description
@@ -29,6 +30,7 @@ namespace RestSrvr.Description
     /// <summary>
     /// Represents an operation description
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class OperationDescription
     {
 

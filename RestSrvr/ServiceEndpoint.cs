@@ -20,6 +20,7 @@
  */
 using RestSrvr.Description;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace RestSrvr
@@ -27,6 +28,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents an endpoint on an HTTP Rest Server
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class ServiceEndpoint
     {
 

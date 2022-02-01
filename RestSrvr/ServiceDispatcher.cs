@@ -23,6 +23,7 @@ using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace RestSrvr
@@ -30,6 +31,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a dispatcher that can call / invoke requests
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class ServiceDispatcher
     {
 

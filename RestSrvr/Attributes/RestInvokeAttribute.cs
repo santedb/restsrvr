@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -26,6 +27,7 @@ namespace RestSrvr.Attributes
     /// Indicates that a particular operation can be invoked using HTTP
     /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    [ExcludeFromCodeCoverage]
     public class RestInvokeAttribute : Attribute
     {
 

@@ -20,12 +20,14 @@
  */
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Description
 {
     /// <summary>
     /// Describes a single endpoint
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class EndpointDescription
     {
         // Trace source

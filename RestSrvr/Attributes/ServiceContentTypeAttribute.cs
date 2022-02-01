@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -26,6 +27,7 @@ namespace RestSrvr.Attributes
     /// Represents a MIME encoding that a particular service understands for consumption
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true)]
+    [ExcludeFromCodeCoverage]
     public class ServiceConsumesAttribute : ServiceContentTypeAttribute
     {
         /// <summary>
@@ -40,6 +42,7 @@ namespace RestSrvr.Attributes
     /// Represents a MIME encoding that a particular service understands for consumption
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true)]
+    [ExcludeFromCodeCoverage]
     public class ServiceProducesAttribute : ServiceContentTypeAttribute
     {
         /// <summary>
@@ -53,6 +56,7 @@ namespace RestSrvr.Attributes
     /// <summary>
     /// Base for content type attributes
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public abstract class ServiceContentTypeAttribute : Attribute
     {
 

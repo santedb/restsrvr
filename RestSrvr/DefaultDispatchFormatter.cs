@@ -28,6 +28,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -42,6 +43,7 @@ namespace RestSrvr
     /// <summary>
     /// Default dispatch formatter
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class DefaultDispatchFormatter : IDispatchMessageFormatter
     {
         // Serializers

@@ -20,6 +20,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
 namespace RestSrvr
@@ -27,6 +28,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents the current operation context for the rest service thread
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class RestOperationContext : IDisposable
     {
         // Current reference for thread

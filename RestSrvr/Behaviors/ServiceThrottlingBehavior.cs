@@ -22,6 +22,7 @@ using RestSrvr.Exceptions;
 using RestSrvr.Message;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
@@ -32,6 +33,7 @@ namespace RestSrvr.Behaviors
     /// Represents a binding behavior that throttles requests
     /// </summary>
     [DisplayName("Service Throttling")]
+    [ExcludeFromCodeCoverage]
     public class ServiceThrottlingBehavior : IServiceBehavior, IMessageInspector
     {
         // Current load

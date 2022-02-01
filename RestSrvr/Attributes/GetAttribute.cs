@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -26,6 +27,7 @@ namespace RestSrvr.Attributes
     /// Identifies the GET operation can be used to invoke a method
     /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
+    [ExcludeFromCodeCoverage]
     public class GetAttribute : RestInvokeAttribute
     {
         /// <summary>

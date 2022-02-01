@@ -23,6 +23,7 @@ using RestSrvr.Message;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -32,6 +33,7 @@ namespace RestSrvr
     /// The service dispatcher is responsible for linking the HTTP listener to the
     /// RestService
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class EndpointDispatcher
     {
 

@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -37,6 +38,7 @@ namespace RestSrvr.Attributes
     /// Message formatting attribute
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple = false)]
+    [ExcludeFromCodeCoverage]
     public class MessageFormatAttribute : Attribute
     {
 

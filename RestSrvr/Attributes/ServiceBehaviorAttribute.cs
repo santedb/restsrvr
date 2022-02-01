@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -43,6 +44,7 @@ namespace RestSrvr.Attributes
     /// Represents a rest service behavior
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
+    [ExcludeFromCodeCoverage]
     public class ServiceBehaviorAttribute : Attribute
     {
         /// <summary>

@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -26,6 +27,7 @@ namespace RestSrvr.Attributes
     /// Indicates a known rest resource on the rest service 
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface, AllowMultiple = true)]
+    [ExcludeFromCodeCoverage]
     public class ServiceKnownResourceAttribute : Attribute
     {
 
