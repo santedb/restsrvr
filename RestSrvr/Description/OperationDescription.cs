@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,12 +16,13 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-5
+ * Date: 2021-8-27
  */
 using RestSrvr.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace RestSrvr.Description
@@ -29,6 +30,7 @@ namespace RestSrvr.Description
     /// <summary>
     /// Represents an operation description
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class OperationDescription
     {
 
