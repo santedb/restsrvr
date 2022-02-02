@@ -49,7 +49,7 @@ namespace RestSrvr
         private readonly int m_maxConcurrencyLevel;
 
         // Min pool workers
-        private readonly int m_minPoolWorkers = Environment.ProcessorCount < 4 ? Environment.ProcessorCount * 2 : Environment.ProcessorCount;
+        private readonly int m_minPoolWorkers = Environment.ProcessorCount < 4 ? Environment.ProcessorCount * 2 : Environment.ProcessorCount ;
 
         // Queue of work items
         private ConcurrentQueue<WorkItem> m_queue = null;
@@ -175,12 +175,12 @@ namespace RestSrvr
         private void GrowPoolSize()
         {
             if (!this.m_queue.IsEmpty &&  // This method is fast
-                        this.m_queue.Count > Environment.ProcessorCount && // This requires a lock so only do if not empty
+                        this.m_queue.Count > 0 && // This requires a lock so only do if not empty
                         this.m_threadPool.Length < this.m_maxConcurrencyLevel) // we have room to allocate new threads
             {
                 lock (s_lock)
                 {
-                    if (this.m_queue.Count > Environment.ProcessorCount &&
+                    if (this.m_queue.Count > this.m_threadPool.Length - this.m_busyWorkers &&
                         this.m_threadPool.Length < this.m_maxConcurrencyLevel)  // Re-check after lock taken
                     {
                         Array.Resize(ref this.m_threadPool, this.m_threadPool.Length + Environment.ProcessorCount); // allocate processor count threads
@@ -287,7 +287,7 @@ namespace RestSrvr
         public void GetWorkerStatus(out int totalWorkers, out int availableWorkers, out int waitingQueue)
         {
             totalWorkers = this.m_threadPool.Length;
-            availableWorkers = totalWorkers - (int)Interlocked.Read(ref m_busyWorkers);
+            availableWorkers = totalWorkers - (int)this.m_busyWorkers;
             waitingQueue = this.m_queue.Count;
         }
 
