@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,8 +16,10 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-5
+ * Date: 2021-8-27
  */
+
+using System.Diagnostics.CodeAnalysis;
 using RestSrvr.Description;
 
 namespace RestSrvr
@@ -25,6 +27,7 @@ namespace RestSrvr
     /// <summary>
     /// Represents a linkage between an endpoint and an operation
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public sealed class EndpointOperation
     {
         // The desccription of the operation

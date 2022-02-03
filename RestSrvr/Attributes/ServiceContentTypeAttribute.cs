@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,9 +16,10 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-5
+ * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RestSrvr.Attributes
 {
@@ -26,6 +27,7 @@ namespace RestSrvr.Attributes
     /// Represents a MIME encoding that a particular service understands for consumption
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true)]
+    [ExcludeFromCodeCoverage]
     public class ServiceConsumesAttribute : ServiceContentTypeAttribute
     {
         /// <summary>
@@ -40,6 +42,7 @@ namespace RestSrvr.Attributes
     /// Represents a MIME encoding that a particular service understands for consumption
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true)]
+    [ExcludeFromCodeCoverage]
     public class ServiceProducesAttribute : ServiceContentTypeAttribute
     {
         /// <summary>
@@ -53,6 +56,7 @@ namespace RestSrvr.Attributes
     /// <summary>
     /// Base for content type attributes
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public abstract class ServiceContentTypeAttribute : Attribute
     {
 

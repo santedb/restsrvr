@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,11 +16,12 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-5
+ * Date: 2021-8-27
  */
 using RestSrvr.Message;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
 
@@ -29,6 +30,7 @@ namespace RestSrvr.Bindings
     /// <summary>
     /// Represents the binding (HTTP server itself) that actually handles the 
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class RestHttpBinding : IEndpointBinding
     {
 
@@ -44,6 +46,42 @@ namespace RestSrvr.Bindings
         // The service context
         private ServiceDispatcher m_serviceDispatcher;
 
+        /// <summary>
+        /// Create the REST HTTP binding 
+        /// </summary>
+        public RestHttpBinding()
+        {
+        }
+
+        /// <summary>
+        /// Process the request from the <paramref name="state"/> passed
+        /// on the action.
+        /// </summary>
+        private void DoProcessRequestInternal(Object accept)
+        {
+            {
+                var context = accept as HttpListenerContext;
+                try
+                {
+                    RestOperationContext.Current = new RestOperationContext(context);
+                    var requestMessage = new RestRequestMessage(context.Request);
+                    using (var responseMessage = new RestResponseMessage(context.Response))
+                    {
+                        this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
+                        if (requestMessage.Method.ToLowerInvariant() != "head")
+                            responseMessage.FlushResponseStream();
+                    }
+                }
+                catch (Exception e)
+                {
+                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+                }
+                finally
+                {
+                    RestOperationContext.Current.Dispose();
+                }
+            }
+        }
 
         /// <summary>
         /// Attach the specified endpoint to this REST binding
@@ -67,29 +105,7 @@ namespace RestSrvr.Bindings
                         var accept = this.m_httpListener.GetContext();
 
                         // Queue work item to run the processing
-                        RestServerThreadPool.Current.QueueUserWorkItem((o) =>
-                        {
-                            var context = accept as HttpListenerContext;
-                            try
-                            {
-                                RestOperationContext.Current = new RestOperationContext(context);
-                                var requestMessage = new RestRequestMessage(context.Request);
-                                using (var responseMessage = new RestResponseMessage(context.Response))
-                                {
-                                    this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
-                                    if (requestMessage.Method.ToLowerInvariant() != "head")
-                                        responseMessage.FlushResponseStream();
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
-                            }
-                            finally
-                            {
-                                RestOperationContext.Current.Dispose();
-                            }
-                        }, accept);
+                        RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
 
                     }
                     catch (Exception e)
