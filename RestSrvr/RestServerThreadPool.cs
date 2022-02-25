@@ -94,7 +94,7 @@ namespace RestSrvr
                 this.m_maxConcurrencyLevel = Environment.ProcessorCount * maxThreadsPerCpu;
             }
             else {
-                this.m_maxConcurrencyLevel = Environment.ProcessorCount * 8;
+                this.m_maxConcurrencyLevel = Environment.ProcessorCount * 24;
             }
             this.EnsureStarted(); // Ensure thread pool threads are started
             this.m_queue = new ConcurrentQueue<WorkItem>();
