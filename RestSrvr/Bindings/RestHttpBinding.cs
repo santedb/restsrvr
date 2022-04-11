@@ -57,29 +57,27 @@ namespace RestSrvr.Bindings
         /// Process the request from the <paramref name="state"/> passed
         /// on the action.
         /// </summary>
-        private void DoProcessRequestInternal(Object accept)
+        private void DoProcessRequestInternal(object accept)
         {
+            var context = accept as HttpListenerContext;
+            try
             {
-                var context = accept as HttpListenerContext;
-                try
+                RestOperationContext.Current = new RestOperationContext(context);
+                var requestMessage = new RestRequestMessage(context.Request);
+                using (var responseMessage = new RestResponseMessage(context.Response))
                 {
-                    RestOperationContext.Current = new RestOperationContext(context);
-                    var requestMessage = new RestRequestMessage(context.Request);
-                    using (var responseMessage = new RestResponseMessage(context.Response))
-                    {
-                        this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
-                        if (requestMessage.Method.ToLowerInvariant() != "head")
-                            responseMessage.FlushResponseStream();
-                    }
+                    this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
+                    if (requestMessage.Method.ToLowerInvariant() != "head")
+                        responseMessage.FlushResponseStream();
                 }
-                catch (Exception e)
-                {
-                    this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
-                }
-                finally
-                {
-                    RestOperationContext.Current.Dispose();
-                }
+            }
+            catch (Exception e)
+            {
+                this.m_traceSource.TraceEvent(TraceEventType.Error, e.HResult, e.ToString());
+            }
+            finally
+            {
+                RestOperationContext.Current.Dispose();
             }
         }
 
@@ -93,6 +91,7 @@ namespace RestSrvr.Bindings
 
             this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
             this.m_httpListener = new HttpListener();
+            this.m_httpListener.UnsafeConnectionNtlmAuthentication = false;
             this.m_httpListener.Prefixes.Add(endpoint.Description.RawUrl);
             this.m_serviceDispatcher = serviceDispatcher;
             // Instantiate the 
@@ -103,7 +102,7 @@ namespace RestSrvr.Bindings
                     try
                     {
                         var accept = this.m_httpListener.GetContext();
-
+                        
                         // Queue work item to run the processing
                         RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
 
