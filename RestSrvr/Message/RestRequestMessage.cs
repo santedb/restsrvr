@@ -23,6 +23,7 @@ using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 namespace RestSrvr.Message
 {
@@ -75,6 +76,21 @@ namespace RestSrvr.Message
         public String Method => this.m_request.HttpMethod;
 
         /// <summary>
+        /// Client certificate
+        /// </summary>
+        public X509Certificate2 ClientCertificate => this.m_request.GetClientCertificate();
+
+        /// <summary>
+        /// Client certificate error code (if present)
+        /// </summary>
+        public int ClientCertificateError => this.m_request.ClientCertificateError;
+
+        /// <summary>
+        /// True if the connection is secure
+        /// </summary>
+        public bool IsSecure => this.m_request.IsSecureConnection;
+
+        /// <summary>
         /// Gets the Operational path
         /// </summary>
         public string OperationPath { get; internal set; }
@@ -96,6 +112,7 @@ namespace RestSrvr.Message
                 this.m_messageContents.Seek(0, SeekOrigin.Begin);
             }
 
+           
             this.m_request = request;
         }
 
