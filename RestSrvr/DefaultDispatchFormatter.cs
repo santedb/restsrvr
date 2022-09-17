@@ -151,8 +151,8 @@ namespace RestSrvr
             // By default unless Accept is application/json , we always prefer application/xml
             if (result == null)
             {
-                if (responseMessage.StatusCode == 200)
-                    responseMessage.StatusCode = 204;
+                if (responseMessage.StatusCode == HttpStatusCode.OK)
+                    responseMessage.StatusCode = HttpStatusCode.NoContent;
             }
             else if (result is Stream)
             {

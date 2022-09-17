@@ -33,5 +33,6 @@ namespace RestSrvr
         /// <param name="service">The service to which the behavior is to be applied</param>
         /// <param name="dispatcher">The dispatcher that the service will be using</param>
         void ApplyServiceBehavior(RestService service, ServiceDispatcher dispatcher);
+
     }
 }

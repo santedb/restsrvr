@@ -96,10 +96,10 @@ namespace RestSrvr
 
                 var ops = this.m_serviceEndpoint.Operations.Where(o => o.Dispatcher.CanDispatch(requestMessage));
                 if (ops.Count() == 0)
-                    throw new FaultException(404, $"Resource not Found - {requestMessage.Url.AbsolutePath}");
+                    throw new FaultException(System.Net.HttpStatusCode.NotFound, $"Resource not Found - {requestMessage.Url.AbsolutePath}");
                 var op = ops.FirstOrDefault(o => requestMessage.Method.ToLowerInvariant() == o.Description.Method.ToLowerInvariant());
                 if (op == null)
-                    throw new FaultException(405, "Method not permitted");
+                    throw new FaultException(System.Net.HttpStatusCode.MethodNotAllowed, "Method not permitted");
 
                 RestOperationContext.Current.EndpointOperation = op;
                 op.Dispatcher.Dispatch(serviceDispatcher, requestMessage, responseMessage);

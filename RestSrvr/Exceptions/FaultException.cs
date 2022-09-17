@@ -20,6 +20,7 @@
  */
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace RestSrvr.Exceptions
 {
@@ -32,14 +33,14 @@ namespace RestSrvr.Exceptions
         /// <summary>
         /// Creates a new fault
         /// </summary>
-        public FaultException(Int32 statusCode) : this(statusCode, null, null)
+        public FaultException(HttpStatusCode statusCode) : this(statusCode, null, null)
         {
         }
 
         /// <summary>
         /// Creates a new fault
         /// </summary>
-        public FaultException(Int32 statusCode, String message, Object resultData = null) : this(statusCode, message, null)
+        public FaultException(HttpStatusCode statusCode, String message, Object resultData = null) : this(statusCode, message, null)
         {
             if (resultData != null)
             {
@@ -50,7 +51,7 @@ namespace RestSrvr.Exceptions
         /// <summary>
         /// Creates a new fault
         /// </summary>
-        public FaultException(Int32 statusCode, String message, Exception innerException) : base(message, innerException)
+        public FaultException(HttpStatusCode statusCode, String message, Exception innerException) : base(message, innerException)
         {
             this.StatusCode = statusCode;
         }
@@ -58,7 +59,12 @@ namespace RestSrvr.Exceptions
         /// <summary>
         /// Status code to supply
         /// </summary>
-        public Int32 StatusCode { get; set; }
+        public HttpStatusCode StatusCode { get; set; }
+
+        /// <summary>
+        /// Gets the body of the fault
+        /// </summary>
+        public object Body { get; set; }
     }
 
     /// <summary>
@@ -70,26 +76,26 @@ namespace RestSrvr.Exceptions
         /// <summary>
         /// The body object of the fault
         /// </summary>
-        public TBody Body { get; set; }
+        public new TBody Body { get => (TBody)base.Body; set => base.Body = value; }
 
         /// <summary>
         /// Represents the fault exception
         /// </summary>
-        public FaultException(Int32 statusCode, TBody data) : this(statusCode, data, null, null)
+        public FaultException(HttpStatusCode statusCode, TBody data) : this(statusCode, data, null, null)
         {
         }
 
         /// <summary>
         /// Represents the fault exception
         /// </summary>
-        public FaultException(Int32 statusCode, TBody data, String message) : this(statusCode, data, message, null)
+        public FaultException(HttpStatusCode statusCode, TBody data, String message) : this(statusCode, data, message, null)
         {
         }
 
         /// <summary>
         /// Represents the fault exception
         /// </summary>
-        public FaultException(Int32 statusCode, TBody data, String message, Exception innerException) : base(statusCode, message, innerException)
+        public FaultException(HttpStatusCode statusCode, TBody data, String message, Exception innerException) : base(statusCode, message, innerException)
         {
             this.Body = data;
         }

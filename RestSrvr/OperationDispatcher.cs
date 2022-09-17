@@ -183,7 +183,7 @@ namespace RestSrvr
 
                 // Validate parameters
                 if (!Enumerable.Range(0, invoke.GetParameters().Length).All(o => parameters[o] == null || invoke.GetParameters()[o].ParameterType.IsAssignableFrom(parameters[o]?.GetType())))
-                    throw new FaultException(400, "Bad Request");
+                    throw new FaultException(System.Net.HttpStatusCode.BadRequest, "Bad Request");
 
                 // Gather instance 
                 object instance = serviceDispatcher.Service.Instance;
@@ -198,7 +198,7 @@ namespace RestSrvr
                     responseMessage.Format = format.Value;
 
                 if (result == null && responseMessage.StatusCode == 0)
-                    responseMessage.StatusCode = 204;
+                    responseMessage.StatusCode = System.Net.HttpStatusCode.NoContent;
                 else
                     this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
 

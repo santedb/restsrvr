@@ -24,6 +24,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Xml.Linq;
 
@@ -72,7 +73,7 @@ namespace RestSrvr.Behaviors
             if (this.m_currentLoad > this.m_maxConcurrency)
             {
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Retry-After", "1200");
-                throw new FaultException(429, "Too Many Requests");
+                throw new FaultException((HttpStatusCode)429, "Too Many Requests");
             }
         }
 
