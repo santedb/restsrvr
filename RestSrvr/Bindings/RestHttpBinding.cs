@@ -68,7 +68,9 @@ namespace RestSrvr.Bindings
                 {
                     this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
                     if (requestMessage.Method.ToLowerInvariant() != "head")
+                    {
                         responseMessage.FlushResponseStream();
+                    }
                 }
             }
             catch (Exception e)
@@ -87,7 +89,9 @@ namespace RestSrvr.Bindings
         public void AttachEndpoint(ServiceDispatcher serviceDispatcher, ServiceEndpoint endpoint)
         {
             if (this.m_httpListener != null)
+            {
                 throw new InvalidOperationException("Cannot attach endpoint to running listener");
+            }
 
             this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
             this.m_httpListener = new HttpListener();
@@ -102,7 +106,7 @@ namespace RestSrvr.Bindings
                     try
                     {
                         var accept = this.m_httpListener.GetContext();
-                        
+
                         // Queue work item to run the processing
                         RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
 

@@ -46,11 +46,19 @@ namespace RestSrvr.Description
             this.m_contract = contract;
 
             if (baseUri.Host == "0.0.0.0")
+            {
                 this.m_rawUrl = baseUri.ToString().Replace("://0.0.0.0", "://+");
+            }
             else
+            {
                 this.m_rawUrl = baseUri.ToString();
+            }
+
             if (!this.m_rawUrl.EndsWith("/"))
+            {
                 this.m_rawUrl += "/";
+            }
+
             this.m_listenUri = baseUri;
         }
 

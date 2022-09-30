@@ -83,7 +83,9 @@ namespace RestSrvr.Behaviors
         public void ApplyServiceBehavior(RestService service, ServiceDispatcher dispatcher)
         {
             foreach (var ep in dispatcher.Service.Endpoints)
+            {
                 ep.Dispatcher.MessageInspectors.Add(this);
+            }
         }
 
         /// <summary>

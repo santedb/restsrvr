@@ -73,9 +73,14 @@ namespace RestSrvr
         public void Start()
         {
             if (this.IsRunning)
+            {
                 throw new InvalidOperationException("Already running");
+            }
             else if (this.m_endpoints.Count == 0)
+            {
                 throw new InvalidOperationException($"Service {this.Name} has 0 endpoints");
+            }
+
             this.IsRunning = true;
 
             try
@@ -84,16 +89,26 @@ namespace RestSrvr
 
                 var dispatcher = new ServiceDispatcher(this);
                 foreach (var bhvr in this.m_serviceBehaviors)
+                {
                     bhvr.ApplyServiceBehavior(this, dispatcher);
+                }
 
                 // Apply behaviors
                 foreach (var ep in this.Endpoints)
                 {
                     foreach (var bhvr in ep.Behaviors)
+                    {
                         bhvr.ApplyEndpointBehavior(ep, ep.Dispatcher);
+                    }
+
                     foreach (var op in ep.Operations)
+                    {
                         foreach (var bhvr in op.Description.Behaviors)
+                        {
                             bhvr.ApplyOperationBehavior(op, op.Dispatcher);
+                        }
+                    }
+
                     ep.Binding.AttachEndpoint(dispatcher, ep);
                 }
             }
@@ -110,7 +125,10 @@ namespace RestSrvr
         public void Stop()
         {
             foreach (var ep in this.Endpoints)
+            {
                 ep.Binding.DetachEndpoint(ep);
+            }
+
             this.IsRunning = false;
         }
 
@@ -139,7 +157,9 @@ namespace RestSrvr
         public void AddServiceEndpoint(ServiceEndpoint endpoint)
         {
             if (endpoint == null)
+            {
                 throw new ArgumentNullException(nameof(endpoint));
+            }
 
             this.m_endpoints.Add(endpoint);
         }
@@ -150,13 +170,21 @@ namespace RestSrvr
         public ServiceEndpoint AddServiceEndpoint(Uri baseUri, Type contractType, IEndpointBinding binding)
         {
             if (baseUri == null)
+            {
                 throw new ArgumentNullException(nameof(baseUri));
+            }
             else if (contractType == null)
+            {
                 throw new ArgumentNullException(nameof(contractType));
+            }
             else if (this.m_endpoints.Any(o => o.Description.RawUrl == baseUri.ToString()))
+            {
                 throw new InvalidOperationException("Another endpoint has already been registered with this base URI");
+            }
             else if (!contractType.IsAssignableFrom(this.m_serviceType))
+            {
                 throw new InvalidOperationException($"{this.m_serviceType.FullName} does not implement contract {contractType.FullName}");
+            }
 
             var ep = new ServiceEndpoint(new EndpointDescription(baseUri, contractType), binding);
             this.m_endpoints.Add(ep);
@@ -173,7 +201,9 @@ namespace RestSrvr
             this.m_serviceMode = behaviorAttribute?.InstanceMode ?? ServiceInstanceMode.PerCall;
 
             if (this.m_serviceMode == ServiceInstanceMode.Singleton)
+            {
                 this.m_instance = Activator.CreateInstance(behaviorType);
+            }
 
             this.Name = behaviorAttribute?.Name ?? behaviorType.FullName;
         }
@@ -188,9 +218,14 @@ namespace RestSrvr
             this.m_serviceMode = behaviorAttribute?.InstanceMode ?? ServiceInstanceMode.PerCall;
 
             if (this.m_serviceMode == ServiceInstanceMode.Singleton)
+            {
                 this.m_instance = behaviorInstance;
+            }
             else
+            {
                 throw new InvalidOperationException("Cannot use this constructor with non-singleton services");
+            }
+
             this.Name = behaviorAttribute?.Name ?? this.m_serviceType.FullName;
         }
 
@@ -200,7 +235,10 @@ namespace RestSrvr
         public void AddServiceBehavior(IServiceBehavior behavior)
         {
             if (this.IsRunning)
+            {
                 throw new InvalidOperationException("Cannot add policy when service is running");
+            }
+
             this.m_serviceBehaviors.Add(behavior);
         }
     }

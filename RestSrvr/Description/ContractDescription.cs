@@ -65,7 +65,9 @@ namespace RestSrvr.Description
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter ContractDescription CTOR ({0})", contractType);
 
             if (!contractType.IsInterface)
+            {
                 throw new InvalidOperationException("Contract type must be an interface");
+            }
 
             // Get the name of the contract
             this.Type = contractType;

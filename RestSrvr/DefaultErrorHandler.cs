@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Security;
 using System.Text;
 using System.Xml;
@@ -60,7 +59,7 @@ namespace RestSrvr
                 cause = cause.InnerException;
             }
 
-            switch(cause)
+            switch (cause)
             {
                 case FileNotFoundException fnf:
                 case KeyNotFoundException knf:

@@ -112,7 +112,7 @@ namespace RestSrvr.Message
                 this.m_messageContents.Seek(0, SeekOrigin.Begin);
             }
 
-           
+
             this.m_request = request;
         }
 

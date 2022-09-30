@@ -49,7 +49,7 @@ namespace RestSrvr
         private readonly int m_maxConcurrencyLevel;
 
         // Min pool workers
-        private readonly int m_minPoolWorkers = Environment.ProcessorCount < 4 ? Environment.ProcessorCount * 2 : Environment.ProcessorCount ;
+        private readonly int m_minPoolWorkers = Environment.ProcessorCount < 4 ? Environment.ProcessorCount * 2 : Environment.ProcessorCount;
 
         // Queue of work items
         private ConcurrentQueue<WorkItem> m_queue = null;
@@ -77,8 +77,13 @@ namespace RestSrvr
             get
             {
                 if (s_current == null)
+                {
                     lock (s_lock) // only want one
+                    {
                         s_current = s_current ?? new RestServerThreadPool();
+                    }
+                }
+
                 return s_current;
             }
         }
@@ -93,7 +98,8 @@ namespace RestSrvr
             {
                 this.m_maxConcurrencyLevel = Environment.ProcessorCount * maxThreadsPerCpu;
             }
-            else {
+            else
+            {
                 this.m_maxConcurrencyLevel = Environment.ProcessorCount * 24;
             }
             this.EnsureStarted(); // Ensure thread pool threads are started
@@ -275,7 +281,7 @@ namespace RestSrvr
                 {
                     return;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                 }
             }
@@ -296,7 +302,10 @@ namespace RestSrvr
         /// </summary>
         private void ThrowIfDisposed()
         {
-            if (this.m_disposing) throw new ObjectDisposedException(nameof(RestServerThreadPool));
+            if (this.m_disposing)
+            {
+                throw new ObjectDisposedException(nameof(RestServerThreadPool));
+            }
         }
 
         #region IDisposable Members
@@ -306,7 +315,10 @@ namespace RestSrvr
         /// </summary>
         public void Dispose()
         {
-            if (this.m_disposing) return;
+            if (this.m_disposing)
+            {
+                return;
+            }
 
             this.m_disposing = true;
 
@@ -317,7 +329,10 @@ namespace RestSrvr
                 for (int i = 0; i < m_threadPool.Length; i++)
                 {
                     if (!m_threadPool[i].Join(1000))
+                    {
                         m_threadPool[i].Abort();
+                    }
+
                     m_threadPool[i] = null;
                 }
             }

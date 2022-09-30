@@ -152,7 +152,9 @@ namespace RestSrvr
             if (result == null)
             {
                 if (responseMessage.StatusCode == HttpStatusCode.OK)
+                {
                     responseMessage.StatusCode = HttpStatusCode.NoContent;
+                }
             }
             else if (result is Stream)
             {
@@ -201,7 +203,10 @@ namespace RestSrvr
                 {
                     // Custom serialization for XML of a dynamic
                     if (result.GetType() == typeof(ExpandoObject))
+                    {
                         result = new List<ExpandoObject>() { result as ExpandoObject };
+                    }
+
                     var ms = new MemoryStream();
                     using (var xw = XmlWriter.Create(ms, new XmlWriterSettings() { CloseOutput = false })) // Write dynamic
                     {
@@ -214,9 +219,14 @@ namespace RestSrvr
                             {
                                 xw.WriteStartElement(prop.Key);
                                 if (prop.Value is Guid)
+                                {
                                     xw.WriteValue(prop.Value.ToString());
+                                }
                                 else if (prop.Value != null)
+                                {
                                     xw.WriteValue(prop.Value);
+                                }
+
                                 xw.WriteEndElement();
                             }
                             xw.WriteEndElement();
