@@ -19,6 +19,7 @@
  * Date: 2022-5-30
  */
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
@@ -35,6 +36,7 @@ namespace RestSrvr.Exceptions
         /// </summary>
         public FaultException(HttpStatusCode statusCode) : this(statusCode, null, null)
         {
+
         }
 
         /// <summary>
@@ -54,6 +56,7 @@ namespace RestSrvr.Exceptions
         public FaultException(HttpStatusCode statusCode, String message, Exception innerException) : base(message, innerException)
         {
             this.StatusCode = statusCode;
+            this.Headers = new WebHeaderCollection();
         }
 
         /// <summary>
@@ -65,6 +68,10 @@ namespace RestSrvr.Exceptions
         /// Gets the body of the fault
         /// </summary>
         public object Body { get; set; }
+        /// <summary>
+        /// Get the headers to add to the response
+        /// </summary>
+        public WebHeaderCollection Headers { get; }
     }
 
     /// <summary>
