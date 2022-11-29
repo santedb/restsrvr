@@ -66,10 +66,10 @@ namespace RestSrvr
                 {
                     contentType = new ContentType(contentTypeHeader);
                 }
-
+                var methodparameters = operation.Description.InvokeMethod.GetParameters();
                 for (int pNumber = 0; pNumber < parameters.Length; pNumber++)
                 {
-                    var parm = operation.Description.InvokeMethod.GetParameters()[pNumber];
+                    var parm = methodparameters[pNumber];
 
                     // TODO: Look for MessageFormatAttribute for override
 
@@ -80,7 +80,7 @@ namespace RestSrvr
                     }
                     else
                     {
-                        switch (contentType.MediaType)
+                        switch (contentType?.MediaType)
                         {
                             case "application/xml":
                                 if (!this.m_serializers.TryGetValue(parm.ParameterType, out XmlSerializer serializer))
@@ -121,6 +121,9 @@ namespace RestSrvr
                                     }
                                 }
                                 parameters[pNumber] = nvc;
+                                break;
+                            case null:
+                                parameters[pNumber] = null;
                                 break;
                             default:
                                 throw new InvalidOperationException("Invalid request format");
