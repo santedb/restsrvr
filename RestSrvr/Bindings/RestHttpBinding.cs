@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RestSrvr.Bindings
 {
@@ -105,10 +106,18 @@ namespace RestSrvr.Bindings
                 {
                     try
                     {
-                        var accept = this.m_httpListener.GetContext();
+                        var cancellationTokenSource = new CancellationTokenSource();
+                        cancellationTokenSource.CancelAfter(10000);
+                        using (var task = Task.Run(this.m_httpListener.GetContextAsync, cancellationTokenSource.Token)) {
+                            try
+                            {
+                                var accept = task.Result;
+                                RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
+                            }
+                            catch(OperationCanceledException) { }
+                        }
 
                         // Queue work item to run the processing
-                        RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
 
                     }
                     catch (Exception e)
