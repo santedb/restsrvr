@@ -245,7 +245,7 @@ namespace RestSrvr
             {
                 try
                 {
-                    this.m_resetEvent.Wait(30000);
+                    this.m_resetEvent.Wait(3000);
 
                     if (threadPoolIndex >= this.m_minPoolWorkers &&
                         this.m_queue.IsEmpty &&
