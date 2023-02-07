@@ -71,6 +71,7 @@ namespace RestSrvr.Bindings
                     if (requestMessage.Method.ToLowerInvariant() != "head")
                     {
                         responseMessage.FlushResponseStream();
+                        responseMessage.Body?.Dispose();
                     }
                 }
             }
