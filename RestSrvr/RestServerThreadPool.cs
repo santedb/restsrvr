@@ -63,6 +63,9 @@ namespace RestSrvr
         // Object for pulsing
         private ManualResetEventSlim m_resetEvent = new ManualResetEventSlim(false);
 
+        //Cancellation token source for shutdown of thread pool
+        private readonly CancellationTokenSource m_CancellationTokenSource;
+
         // Get current thread pool
         private static RestServerThreadPool s_current;
 
@@ -93,6 +96,8 @@ namespace RestSrvr
         /// </summary>
         private RestServerThreadPool()
         {
+            m_CancellationTokenSource = new CancellationTokenSource();
+
             var envMaxThreads = Environment.GetEnvironmentVariable(MAX_CONCURRENCY);
             if (!String.IsNullOrEmpty(envMaxThreads) && int.TryParse(envMaxThreads, out var maxThreadsPerCpu))
             {
@@ -195,7 +200,7 @@ namespace RestSrvr
                             if (this.m_threadPool[i] == null)
                             {
                                 this.m_threadPool[i] = this.CreateThreadPoolThread();
-                                this.m_threadPool[i].Start();
+                                this.m_threadPool[i].Start(m_CancellationTokenSource.Token);
                             }
                         }
                     }
@@ -215,7 +220,7 @@ namespace RestSrvr
                 for (int i = 0; i < m_threadPool.Length; i++)
                 {
                     m_threadPool[i] = this.CreateThreadPoolThread();
-                    m_threadPool[i].Start();
+                    m_threadPool[i].Start(m_CancellationTokenSource.Token);
                 }
             }
         }
@@ -236,16 +241,30 @@ namespace RestSrvr
         /// <summary>
         /// Dispatch loop
         /// </summary>
-        private void DispatchLoop()
+        private void DispatchLoop(object state)
         {
+            CancellationToken token = CancellationToken.None;
+
+            if (state is CancellationToken cts)
+            {
+                token = cts;
+            }
+
             long lastActivityJobTime = DateTime.Now.Ticks;
             int threadPoolIndex = Array.IndexOf(this.m_threadPool, Thread.CurrentThread);
 
-            while (!this.m_disposing)
+            while (!(this.m_disposing || token.IsCancellationRequested))
             {
                 try
                 {
-                    this.m_resetEvent.Wait(3000);
+                    try
+                    {
+                        this.m_resetEvent.Wait(3000, token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        continue;
+                    }
 
                     if (threadPoolIndex >= this.m_minPoolWorkers &&
                         this.m_queue.IsEmpty &&
@@ -272,6 +291,11 @@ namespace RestSrvr
                             finally
                             {
                                 Interlocked.Decrement(ref m_busyWorkers);
+                            }
+
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
                             }
                         }
                     }
@@ -324,18 +348,22 @@ namespace RestSrvr
 
             this.m_resetEvent.Set();
 
-            if (m_threadPool != null)
-            {
-                for (int i = 0; i < m_threadPool.Length; i++)
-                {
-                    if (!m_threadPool[i].Join(1000))
-                    {
-                        m_threadPool[i].Abort();
-                    }
+            this.m_CancellationTokenSource.Cancel();
 
-                    m_threadPool[i] = null;
-                }
-            }
+            this.m_CancellationTokenSource.Dispose();
+
+            //if (m_threadPool != null)
+            //{
+            //    for (int i = 0; i < m_threadPool.Length; i++)
+            //    {
+            //        if (!m_threadPool[i].Join(1000))
+            //        {
+            //            m_threadPool[i].Abort();
+            //        }
+
+            //        m_threadPool[i] = null;
+            //    }
+            //}
         }
     }
 
