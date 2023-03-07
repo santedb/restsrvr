@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
@@ -58,7 +58,10 @@ namespace RestSrvr
             this.m_serviceEndpoint = serviceEndpoint;
             var rawUrl = serviceEndpoint.Description.RawUrl.Replace("://+", "://.+?");
             if (rawUrl.EndsWith("/"))
+            {
                 rawUrl = rawUrl.Substring(0, rawUrl.Length - 1);
+            }
+
             this.m_endpointRegex = new Regex($"^({rawUrl.Replace("://+", "://.+?")}/?).*");
         }
 
@@ -75,7 +78,10 @@ namespace RestSrvr
                 requestMessage.OperationPath = this.GetOperationPath(requestMessage.Url);
                 return true;
             }
-            else return false;
+            else
+            {
+                return false;
+            }
         }
 
 
@@ -92,21 +98,30 @@ namespace RestSrvr
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin endpoint dispatch of {0} {1} > {2}", requestMessage.Method, requestMessage.Url, this.m_serviceEndpoint.Description.Contract);
 
                 foreach (var mfi in this.m_messageInspector)
+                {
                     mfi.AfterReceiveRequest(requestMessage);
+                }
 
                 var ops = this.m_serviceEndpoint.Operations.Where(o => o.Dispatcher.CanDispatch(requestMessage));
                 if (ops.Count() == 0)
-                    throw new FaultException(404, $"Resource not Found - {requestMessage.Url.AbsolutePath}");
+                {
+                    throw new FaultException(System.Net.HttpStatusCode.NotFound, $"Resource not Found - {requestMessage.Url.AbsolutePath}");
+                }
+
                 var op = ops.FirstOrDefault(o => requestMessage.Method.ToLowerInvariant() == o.Description.Method.ToLowerInvariant());
                 if (op == null)
-                    throw new FaultException(405, "Method not permitted");
+                {
+                    throw new FaultException(System.Net.HttpStatusCode.MethodNotAllowed, "Method not permitted");
+                }
 
                 RestOperationContext.Current.EndpointOperation = op;
                 op.Dispatcher.Dispatch(serviceDispatcher, requestMessage, responseMessage);
 
                 // Allow message inspectors to inspect before sending response
                 foreach (var mfi in this.m_messageInspector)
+                {
                     mfi.BeforeSendResponse(responseMessage);
+                }
 
                 return true;
             }
@@ -124,9 +139,13 @@ namespace RestSrvr
         {
             var matches = this.m_endpointRegex.Match(requestUrl.ToString());
             if (matches.Success)
+            {
                 return requestUrl.ToString().Substring(matches.Groups[1].Value.Length).Split('?')[0];
+            }
             else
+            {
                 throw new InvalidOperationException("Cannot match this path");
+            }
         }
     }
 }

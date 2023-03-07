@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using Newtonsoft.Json;
 using RestSrvr.Exceptions;
@@ -25,7 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 using System.Security;
 using System.Text;
 using System.Xml;
@@ -59,33 +59,35 @@ namespace RestSrvr
                 cause = cause.InnerException;
             }
 
-            if (cause is FileNotFoundException || cause is KeyNotFoundException)
-                response.StatusCode = 404;
-            else if (cause is InvalidOperationException)
-                response.StatusCode = 500;
-            else if (cause is XmlException || cause is JsonException)
-                response.StatusCode = 400;
-            else if (cause is SecurityException || cause is UnauthorizedAccessException)
+            switch (cause)
             {
-                response.AddAuthenticateHeader("bearer", RestOperationContext.Current.IncomingRequest.Headers["Host"]);
-                response.StatusCode = 401;
-            }
-            else if (cause is NotSupportedException)
-                response.StatusCode = 405;
-            else if (cause is NotImplementedException)
-                response.StatusCode = 501;
-            else if (cause is FaultException)
-            {
-                response.StatusCode = (cause as FaultException).StatusCode;
-                if (cause.GetType() != typeof(FaultException)) // Special classification
-                {
-                    var errorData = error.GetType().GetRuntimeProperty("Body").GetValue(cause);
-                    new DefaultDispatchFormatter().SerializeResponse(response, null, errorData);
+                case FileNotFoundException fnf:
+                case KeyNotFoundException knf:
+                    response.StatusCode = System.Net.HttpStatusCode.NotFound;
+                    break;
+                case XmlException xe:
+                case JsonException je:
+                    response.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                    break;
+                case SecurityException se:
+                case UnauthorizedAccessException uae:
+                    response.StatusCode = System.Net.HttpStatusCode.Unauthorized;
+                    RestOperationContext.Current.AppliedPolicies.OfType<IAuthorizationServicePolicy>().FirstOrDefault()?.AddAuthenticateChallengeHeader(response, cause);
+                    break;
+                case NotSupportedException nse:
+                    response.StatusCode = System.Net.HttpStatusCode.MethodNotAllowed;
+                    break;
+                case NotImplementedException nie:
+                    response.StatusCode = System.Net.HttpStatusCode.NotImplemented;
+                    break;
+                case FaultException fe:
+                    response.StatusCode = fe.StatusCode;
+                    new DefaultDispatchFormatter().SerializeResponse(response, null, fe.Body);
                     return true;
-                }
+                default:
+                    response.StatusCode = System.Net.HttpStatusCode.InternalServerError;
+                    break;
             }
-            else
-                response.StatusCode = 500;
 
             // Load the exception screen
             using (var sr = new StreamReader(typeof(DefaultErrorHandler).Assembly.GetManifestResourceStream("RestSrvr.Resources.ServiceError.html")))

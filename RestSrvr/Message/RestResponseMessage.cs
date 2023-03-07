@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using RestSrvr.Attributes;
 using System;
@@ -68,10 +68,10 @@ namespace RestSrvr.Message
         /// <summary>
         /// Gets or sets the response status code
         /// </summary>
-        public int StatusCode
+        public HttpStatusCode StatusCode
         {
-            get => this.m_response.StatusCode;
-            set => this.m_response.StatusCode = value;
+            get => (HttpStatusCode)this.m_response.StatusCode;
+            set => this.m_response.StatusCode = (int)value;
         }
 
         /// <summary>

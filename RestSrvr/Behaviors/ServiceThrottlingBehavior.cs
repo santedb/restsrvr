@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
@@ -24,6 +24,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Xml.Linq;
 
@@ -72,7 +73,7 @@ namespace RestSrvr.Behaviors
             if (this.m_currentLoad > this.m_maxConcurrency)
             {
                 RestOperationContext.Current.OutgoingResponse.Headers.Add("Retry-After", "1200");
-                throw new FaultException(429, "Too Many Requests");
+                throw new FaultException((HttpStatusCode)429, "Too Many Requests");
             }
         }
 
@@ -82,7 +83,9 @@ namespace RestSrvr.Behaviors
         public void ApplyServiceBehavior(RestService service, ServiceDispatcher dispatcher)
         {
             foreach (var ep in dispatcher.Service.Endpoints)
+            {
                 ep.Dispatcher.MessageInspectors.Add(this);
+            }
         }
 
         /// <summary>

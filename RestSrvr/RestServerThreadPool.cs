@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using System;
 using System.Collections.Concurrent;
@@ -49,7 +49,7 @@ namespace RestSrvr
         private readonly int m_maxConcurrencyLevel;
 
         // Min pool workers
-        private readonly int m_minPoolWorkers = Environment.ProcessorCount < 4 ? Environment.ProcessorCount * 2 : Environment.ProcessorCount ;
+        private readonly int m_minPoolWorkers = Environment.ProcessorCount < 4 ? Environment.ProcessorCount * 2 : Environment.ProcessorCount;
 
         // Queue of work items
         private ConcurrentQueue<WorkItem> m_queue = null;
@@ -62,6 +62,9 @@ namespace RestSrvr
 
         // Object for pulsing
         private ManualResetEventSlim m_resetEvent = new ManualResetEventSlim(false);
+
+        //Cancellation token source for shutdown of thread pool
+        private readonly CancellationTokenSource m_CancellationTokenSource;
 
         // Get current thread pool
         private static RestServerThreadPool s_current;
@@ -77,8 +80,13 @@ namespace RestSrvr
             get
             {
                 if (s_current == null)
+                {
                     lock (s_lock) // only want one
+                    {
                         s_current = s_current ?? new RestServerThreadPool();
+                    }
+                }
+
                 return s_current;
             }
         }
@@ -88,12 +96,15 @@ namespace RestSrvr
         /// </summary>
         private RestServerThreadPool()
         {
+            m_CancellationTokenSource = new CancellationTokenSource();
+
             var envMaxThreads = Environment.GetEnvironmentVariable(MAX_CONCURRENCY);
             if (!String.IsNullOrEmpty(envMaxThreads) && int.TryParse(envMaxThreads, out var maxThreadsPerCpu))
             {
                 this.m_maxConcurrencyLevel = Environment.ProcessorCount * maxThreadsPerCpu;
             }
-            else {
+            else
+            {
                 this.m_maxConcurrencyLevel = Environment.ProcessorCount * 24;
             }
             this.EnsureStarted(); // Ensure thread pool threads are started
@@ -189,7 +200,7 @@ namespace RestSrvr
                             if (this.m_threadPool[i] == null)
                             {
                                 this.m_threadPool[i] = this.CreateThreadPoolThread();
-                                this.m_threadPool[i].Start();
+                                this.m_threadPool[i].Start(m_CancellationTokenSource.Token);
                             }
                         }
                     }
@@ -209,7 +220,7 @@ namespace RestSrvr
                 for (int i = 0; i < m_threadPool.Length; i++)
                 {
                     m_threadPool[i] = this.CreateThreadPoolThread();
-                    m_threadPool[i].Start();
+                    m_threadPool[i].Start(m_CancellationTokenSource.Token);
                 }
             }
         }
@@ -230,16 +241,30 @@ namespace RestSrvr
         /// <summary>
         /// Dispatch loop
         /// </summary>
-        private void DispatchLoop()
+        private void DispatchLoop(object state)
         {
+            CancellationToken token = CancellationToken.None;
+
+            if (state is CancellationToken cts)
+            {
+                token = cts;
+            }
+
             long lastActivityJobTime = DateTime.Now.Ticks;
             int threadPoolIndex = Array.IndexOf(this.m_threadPool, Thread.CurrentThread);
 
-            while (!this.m_disposing)
+            while (!(this.m_disposing || token.IsCancellationRequested))
             {
                 try
                 {
-                    this.m_resetEvent.Wait(30000);
+                    try
+                    {
+                        this.m_resetEvent.Wait(3000, token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        continue;
+                    }
 
                     if (threadPoolIndex >= this.m_minPoolWorkers &&
                         this.m_queue.IsEmpty &&
@@ -267,6 +292,11 @@ namespace RestSrvr
                             {
                                 Interlocked.Decrement(ref m_busyWorkers);
                             }
+
+                            if (token.IsCancellationRequested)
+                            {
+                                break;
+                            }
                         }
                     }
                     this.m_resetEvent.Reset();
@@ -275,7 +305,7 @@ namespace RestSrvr
                 {
                     return;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                 }
             }
@@ -296,7 +326,10 @@ namespace RestSrvr
         /// </summary>
         private void ThrowIfDisposed()
         {
-            if (this.m_disposing) throw new ObjectDisposedException(nameof(RestServerThreadPool));
+            if (this.m_disposing)
+            {
+                throw new ObjectDisposedException(nameof(RestServerThreadPool));
+            }
         }
 
         #region IDisposable Members
@@ -306,21 +339,31 @@ namespace RestSrvr
         /// </summary>
         public void Dispose()
         {
-            if (this.m_disposing) return;
+            if (this.m_disposing)
+            {
+                return;
+            }
 
             this.m_disposing = true;
 
             this.m_resetEvent.Set();
 
-            if (m_threadPool != null)
-            {
-                for (int i = 0; i < m_threadPool.Length; i++)
-                {
-                    if (!m_threadPool[i].Join(1000))
-                        m_threadPool[i].Abort();
-                    m_threadPool[i] = null;
-                }
-            }
+            this.m_CancellationTokenSource.Cancel();
+
+            this.m_CancellationTokenSource.Dispose();
+
+            //if (m_threadPool != null)
+            //{
+            //    for (int i = 0; i < m_threadPool.Length; i++)
+            //    {
+            //        if (!m_threadPool[i].Join(1000))
+            //        {
+            //            m_threadPool[i].Abort();
+            //        }
+
+            //        m_threadPool[i] = null;
+            //    }
+            //}
         }
     }
 

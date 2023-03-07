@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -66,10 +66,10 @@ namespace RestSrvr
                 {
                     contentType = new ContentType(contentTypeHeader);
                 }
-
+                var methodparameters = operation.Description.InvokeMethod.GetParameters();
                 for (int pNumber = 0; pNumber < parameters.Length; pNumber++)
                 {
-                    var parm = operation.Description.InvokeMethod.GetParameters()[pNumber];
+                    var parm = methodparameters[pNumber];
 
                     // TODO: Look for MessageFormatAttribute for override
 
@@ -80,7 +80,7 @@ namespace RestSrvr
                     }
                     else
                     {
-                        switch (contentType.MediaType)
+                        switch (contentType?.MediaType)
                         {
                             case "application/xml":
                                 if (!this.m_serializers.TryGetValue(parm.ParameterType, out XmlSerializer serializer))
@@ -122,6 +122,9 @@ namespace RestSrvr
                                 }
                                 parameters[pNumber] = nvc;
                                 break;
+                            case null:
+                                parameters[pNumber] = null;
+                                break;
                             default:
                                 throw new InvalidOperationException("Invalid request format");
 
@@ -151,8 +154,10 @@ namespace RestSrvr
             // By default unless Accept is application/json , we always prefer application/xml
             if (result == null)
             {
-                if (responseMessage.StatusCode == 200)
-                    responseMessage.StatusCode = 204;
+                if (responseMessage.StatusCode == HttpStatusCode.OK)
+                {
+                    responseMessage.StatusCode = HttpStatusCode.NoContent;
+                }
             }
             else if (result is Stream)
             {
@@ -201,7 +206,10 @@ namespace RestSrvr
                 {
                     // Custom serialization for XML of a dynamic
                     if (result.GetType() == typeof(ExpandoObject))
+                    {
                         result = new List<ExpandoObject>() { result as ExpandoObject };
+                    }
+
                     var ms = new MemoryStream();
                     using (var xw = XmlWriter.Create(ms, new XmlWriterSettings() { CloseOutput = false })) // Write dynamic
                     {
@@ -214,9 +222,14 @@ namespace RestSrvr
                             {
                                 xw.WriteStartElement(prop.Key);
                                 if (prop.Value is Guid)
+                                {
                                     xw.WriteValue(prop.Value.ToString());
+                                }
                                 else if (prop.Value != null)
+                                {
                                     xw.WriteValue(prop.Value);
+                                }
+
                                 xw.WriteEndElement();
                             }
                             xw.WriteEndElement();

@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using RestSrvr.Exceptions;
 using RestSrvr.Message;
@@ -95,7 +95,9 @@ namespace RestSrvr
 
                 // Find the endpoint 
                 if (ep == null)
-                    throw new FaultException(404, "Resource not Found");
+                {
+                    throw new FaultException(System.Net.HttpStatusCode.NotFound, "Resource not Found");
+                }
 
                 RestOperationContext.Current.ServiceEndpoint = ep;
 

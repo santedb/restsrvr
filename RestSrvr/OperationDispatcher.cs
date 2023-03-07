@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using RestSrvr.Attributes;
 using RestSrvr.Exceptions;
@@ -82,7 +82,11 @@ namespace RestSrvr
                 switch (match.Groups[1].Value[0])
                 {
                     case '{': // parameter
-                        if (parmTypes.Length < parmCount) throw new InvalidOperationException($"REST method accepts {parmTypes.Length} parameters but route specifies more");
+                        if (parmTypes.Length < parmCount)
+                        {
+                            throw new InvalidOperationException($"REST method accepts {parmTypes.Length} parameters but route specifies more");
+                        }
+
                         m_regexGroupNames[parmCount] = match.Groups[1].Value;
                         var ptype = parmTypes[parmCount++];
                         switch (ptype.Name.ToLowerInvariant())
@@ -94,7 +98,10 @@ namespace RestSrvr
                                     regexBuilder.Append(@"(.*?)");
                                 }
                                 else
+                                {
                                     regexBuilder.Append(@"([A-Za-z0-9_\-%\.\~\\]*?)");
+                                }
+
                                 break;
                             case "int32":
                                 regexBuilder.Append("(\\d*?)");
@@ -117,9 +124,14 @@ namespace RestSrvr
                 match = match.NextMatch();
             }
             if (regexBuilder[1] == '/') // starting / is optional
+            {
                 regexBuilder.Insert(2, "?");
+            }
+
             if (regexBuilder[regexBuilder.Length - 1] == '/') // ending with /? is optional
+            {
                 regexBuilder.Append("?");
+            }
 
             regexBuilder.Append("$");
 
@@ -157,7 +169,9 @@ namespace RestSrvr
                 this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Begin operation dispatch of {0} {1} to {2}", requestMessage.Method, requestMessage.Url, this.m_endpointOperation.Description.InvokeMethod);
 
                 foreach (var pol in this.m_operationPolicies)
+                {
                     pol.Apply(this.m_endpointOperation, requestMessage);
+                }
 
                 var invoke = this.m_endpointOperation.Description.InvokeMethod;
                 var parameters = new object[invoke.GetParameters().Length];
@@ -170,9 +184,13 @@ namespace RestSrvr
                     var sparm = invoke.GetParameters()[pindex];
                     object sval = parmMatch.Groups[i + 1].Value;
                     if (sparm.ParameterType == typeof(int))
+                    {
                         sval = Int32.Parse(sval.ToString());
+                    }
                     else if (sparm.ParameterType == typeof(Guid))
+                    {
                         sval = Guid.Parse(sval.ToString());
+                    }
 
                     parameters[pindex] = sval;
                 }
@@ -183,24 +201,34 @@ namespace RestSrvr
 
                 // Validate parameters
                 if (!Enumerable.Range(0, invoke.GetParameters().Length).All(o => parameters[o] == null || invoke.GetParameters()[o].ParameterType.IsAssignableFrom(parameters[o]?.GetType())))
-                    throw new FaultException(400, "Bad Request");
+                {
+                    throw new FaultException(System.Net.HttpStatusCode.BadRequest, "Bad Request");
+                }
 
                 // Gather instance 
                 object instance = serviceDispatcher.Service.Instance;
                 if (serviceDispatcher.Service.InstanceMode == Attributes.ServiceInstanceMode.PerCall)
+                {
                     instance = Activator.CreateInstance(serviceDispatcher.Service.BehaviorType);
+                }
 
                 object result = invoke.Invoke(instance, parameters);
 
                 // Does the invoke override content-type?
                 var format = invoke.ReturnParameter.GetCustomAttribute<MessageFormatAttribute>()?.MessageFormat;
                 if (format.HasValue)
+                {
                     responseMessage.Format = format.Value;
+                }
 
                 if (result == null && responseMessage.StatusCode == 0)
-                    responseMessage.StatusCode = 204;
+                {
+                    responseMessage.StatusCode = System.Net.HttpStatusCode.NoContent;
+                }
                 else
+                {
                     this.DispatchFormatter.SerializeResponse(responseMessage, parameters, result);
+                }
 
                 parameters = null;
 

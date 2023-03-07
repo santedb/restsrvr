@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using RestSrvr.Attributes;
 using System;
@@ -65,12 +65,14 @@ namespace RestSrvr.Description
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter ContractDescription CTOR ({0})", contractType);
 
             if (!contractType.IsInterface)
+            {
                 throw new InvalidOperationException("Contract type must be an interface");
+            }
 
             // Get the name of the contract
             this.Type = contractType;
             this.Name = contractType.GetCustomAttribute<ServiceContractAttribute>()?.Name ?? contractType.FullName;
-            this.m_operations = contractType.GetRuntimeMethods().Where(m => m.GetCustomAttributes<RestInvokeAttribute>().Any()).SelectMany(m => m.GetCustomAttributes<RestInvokeAttribute>().Select(d => new OperationDescription(this, m, d))).ToList();
+            this.m_operations = contractType.GetRuntimeMethods().Union(contractType.GetInterfaces().SelectMany(i=>i.GetRuntimeMethods())).Where(m => m.GetCustomAttributes<RestInvokeAttribute>().Any()).SelectMany(m => m.GetCustomAttributes<RestInvokeAttribute>().Select(d => new OperationDescription(this, m, d))).ToList();
         }
     }
 }

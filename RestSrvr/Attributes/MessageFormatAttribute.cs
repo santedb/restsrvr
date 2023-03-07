@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -29,8 +29,17 @@ namespace RestSrvr.Attributes
     /// </summary>
     public enum MessageFormatType
     {
+        /// <summary>
+        /// The message format on the attribute is unspecified
+        /// </summary>
         Unspecified = 0,
+        /// <summary>
+        /// The message format is expected to be JSON
+        /// </summary>
         Json = 1,
+        /// <summary>
+        /// The message format is XML
+        /// </summary>
         Xml = 2
     }
 

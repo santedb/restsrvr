@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using System;
 
@@ -31,9 +31,9 @@ namespace RestSrvr
         /// <summary>
         /// Create the specified REST service (from configuration)
         /// </summary>
-        /// <param name="serviceBehaviorType">The service behavior</param>
+        /// <param name="serviceName">The service behavior</param>
         /// <returns>The created rest service</returns>
-        RestService CreateService(Type serviceBehaviorType);
+        RestService CreateService(String serviceName);
 
         /// <summary>
         /// Get service capabilities

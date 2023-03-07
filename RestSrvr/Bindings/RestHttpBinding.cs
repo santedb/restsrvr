@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using RestSrvr.Message;
 using System;
@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace RestSrvr.Bindings
 {
@@ -68,7 +69,10 @@ namespace RestSrvr.Bindings
                 {
                     this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
                     if (requestMessage.Method.ToLowerInvariant() != "head")
+                    {
                         responseMessage.FlushResponseStream();
+                        responseMessage.Body?.Dispose();
+                    }
                 }
             }
             catch (Exception e)
@@ -87,7 +91,9 @@ namespace RestSrvr.Bindings
         public void AttachEndpoint(ServiceDispatcher serviceDispatcher, ServiceEndpoint endpoint)
         {
             if (this.m_httpListener != null)
+            {
                 throw new InvalidOperationException("Cannot attach endpoint to running listener");
+            }
 
             this.m_traceSource.TraceEvent(TraceEventType.Information, 0, "Attaching HTTP listener to endpoint: {0}", endpoint.Description.ListenUri);
             this.m_httpListener = new HttpListener();
@@ -101,10 +107,18 @@ namespace RestSrvr.Bindings
                 {
                     try
                     {
-                        var accept = this.m_httpListener.GetContext();
-                        
+                        var cancellationTokenSource = new CancellationTokenSource();
+                        cancellationTokenSource.CancelAfter(10000);
+                        using (var task = Task.Run(this.m_httpListener.GetContextAsync, cancellationTokenSource.Token)) {
+                            try
+                            {
+                                var accept = task.Result;
+                                RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
+                            }
+                            catch(OperationCanceledException) { }
+                        }
+
                         // Queue work item to run the processing
-                        RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
 
                     }
                     catch (Exception e)

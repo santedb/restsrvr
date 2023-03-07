@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using System;
 using System.Collections.Specialized;
@@ -112,7 +112,7 @@ namespace RestSrvr.Message
                 this.m_messageContents.Seek(0, SeekOrigin.Begin);
             }
 
-           
+
             this.m_request = request;
         }
 
