@@ -52,7 +52,8 @@ namespace RestSrvr
         /// <summary>
         /// Creates a new instance of the operation with the specified description
         /// </summary>
-        /// <param name="operationDescription"></param>
+        /// <param name="operationDescription">The operation description to affix to the operation</param>
+        /// <param name="endpoint">The endpoint on which the operation applies</param>
         public EndpointOperation(ServiceEndpoint endpoint, OperationDescription operationDescription)
         {
             this.m_description = operationDescription;
