@@ -72,7 +72,7 @@ namespace RestSrvr.Description
             // Get the name of the contract
             this.Type = contractType;
             this.Name = contractType.GetCustomAttribute<ServiceContractAttribute>()?.Name ?? contractType.FullName;
-            this.m_operations = contractType.GetRuntimeMethods().Union(contractType.GetInterfaces().SelectMany(i=>i.GetRuntimeMethods())).Where(m => m.GetCustomAttributes<RestInvokeAttribute>().Any()).SelectMany(m => m.GetCustomAttributes<RestInvokeAttribute>().Select(d => new OperationDescription(this, m, d))).ToList();
+            this.m_operations = contractType.GetRuntimeMethods().Union(contractType.GetInterfaces().SelectMany(i => i.GetRuntimeMethods())).Where(m => m.GetCustomAttributes<RestInvokeAttribute>().Any()).SelectMany(m => m.GetCustomAttributes<RestInvokeAttribute>().Select(d => new OperationDescription(this, m, d))).ToList();
         }
     }
 }

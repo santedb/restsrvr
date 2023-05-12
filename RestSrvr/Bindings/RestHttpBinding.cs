@@ -109,13 +109,14 @@ namespace RestSrvr.Bindings
                     {
                         var cancellationTokenSource = new CancellationTokenSource();
                         cancellationTokenSource.CancelAfter(10000);
-                        using (var task = Task.Run(this.m_httpListener.GetContextAsync, cancellationTokenSource.Token)) {
+                        using (var task = Task.Run(this.m_httpListener.GetContextAsync, cancellationTokenSource.Token))
+                        {
                             try
                             {
                                 var accept = task.Result;
                                 RestServerThreadPool.Current.QueueUserWorkItem(this.DoProcessRequestInternal, accept);
                             }
-                            catch(OperationCanceledException) { }
+                            catch (OperationCanceledException) { }
                         }
 
                         // Queue work item to run the processing
