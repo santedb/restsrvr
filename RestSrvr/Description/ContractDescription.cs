@@ -29,7 +29,9 @@ using System.Reflection;
 namespace RestSrvr.Description
 {
     /// <summary>
-    /// Represents a contract description
+    /// A contract description maps a single interface type (the 'contract' type) and the associated operations. 
+    /// Operations are marked with one or more <see cref="RestInvokeAttribute"/> attributes and each attribute is 
+    /// used to define an <see cref="OperationDescription"/> for the method.
     /// </summary>
     [ExcludeFromCodeCoverage]
     public sealed class ContractDescription
@@ -64,7 +66,7 @@ namespace RestSrvr.Description
         {
             this.m_traceSource.TraceEvent(TraceEventType.Verbose, 0, "Enter ContractDescription CTOR ({0})", contractType);
 
-            if (!contractType.IsInterface)
+            if (!contractType.IsInterface) //TODO: Why must a contract be based on an interface?
             {
                 throw new InvalidOperationException("Contract type must be an interface");
             }
