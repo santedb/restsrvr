@@ -55,7 +55,7 @@ namespace RestSrvr.Bindings
         }
 
         /// <summary>
-        /// Process the request from the <paramref name="state"/> passed
+        /// Process the request from the <paramref name="accept"/> passed
         /// on the action.
         /// </summary>
         private void DoProcessRequestInternal(object accept)

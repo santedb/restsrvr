@@ -36,11 +36,15 @@ namespace RestSrvr
         // Lock object
         private static object s_lock = new object();
 
-        // Maximum concurrency
+        /// <summary>
+        /// Environment Variable name for max threads per CPU for processing requests.
+        /// </summary>
         public const string MAX_CONCURRENCY = "RESTSRVR_THREADS_PER_CPU";
 
         // Last time the thread pool was resized
+#pragma warning disable CS0414 // The field 'RestServerThreadPool.m_lastGrowTick' is assigned but its value is never used
         private long m_lastGrowTick = 0;
+#pragma warning restore CS0414 // The field 'RestServerThreadPool.m_lastGrowTick' is assigned but its value is never used
 
         // Tracer
         private TraceSource m_tracer = new TraceSource(TraceSources.ThreadingTraceSourceName);

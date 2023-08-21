@@ -22,6 +22,9 @@ using RestSrvr.Message;
 
 namespace RestSrvr
 {
+    /// <summary>
+    /// Do not use this type. Use <see cref="IDispatchMessageFormatter"/> instead.
+    /// </summary>
     public interface IDispatchFormatter
     {
 

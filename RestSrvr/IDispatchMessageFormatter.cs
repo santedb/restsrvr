@@ -22,6 +22,9 @@ using RestSrvr.Message;
 
 namespace RestSrvr
 {
+    /// <summary>
+    /// Handles deserialization and serialization to a message format.
+    /// </summary>
     public interface IDispatchMessageFormatter
     {
 
