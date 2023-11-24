@@ -33,7 +33,7 @@ namespace RestSrvr.Exceptions
         /// <summary>
         /// Creates a new fault
         /// </summary>
-        public FaultException(HttpStatusCode statusCode) : this(statusCode, null, null)
+        public FaultException(HttpStatusCode statusCode) : this(statusCode, $"Fault - {statusCode}", null)
         {
 
         }
