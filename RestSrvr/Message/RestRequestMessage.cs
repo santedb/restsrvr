@@ -31,7 +31,7 @@ namespace RestSrvr.Message
     /// Represents a restful message
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class RestRequestMessage
+    public class RestRequestMessage : IDisposable
     {
         // Headers of the message
         private HttpListenerRequest m_request;
@@ -114,6 +114,12 @@ namespace RestSrvr.Message
 
 
             this.m_request = request;
+        }
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.m_messageContents?.Dispose();
         }
 
     }

@@ -64,14 +64,16 @@ namespace RestSrvr.Bindings
             try
             {
                 RestOperationContext.Current = new RestOperationContext(context);
-                var requestMessage = new RestRequestMessage(context.Request);
-                using (var responseMessage = new RestResponseMessage(context.Response))
+                using (var requestMessage = new RestRequestMessage(context.Request))
                 {
-                    this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
-                    if (requestMessage.Method.ToLowerInvariant() != "head")
+                    using (var responseMessage = new RestResponseMessage(context.Response))
                     {
-                        responseMessage.FlushResponseStream();
-                        responseMessage.Body?.Dispose();
+                        this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
+                        if (requestMessage.Method.ToLowerInvariant() != "head")
+                        {
+                            responseMessage.FlushResponseStream();
+                            responseMessage.Body?.Dispose();
+                        }
                     }
                 }
             }
