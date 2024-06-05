@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  * 
@@ -16,7 +16,7 @@
  * the License.
  * 
  * User: fyfej
- * Date: 2023-5-19
+ * Date: 2023-6-21
  */
 using RestSrvr.Message;
 using System;
@@ -64,14 +64,16 @@ namespace RestSrvr.Bindings
             try
             {
                 RestOperationContext.Current = new RestOperationContext(context);
-                var requestMessage = new RestRequestMessage(context.Request);
-                using (var responseMessage = new RestResponseMessage(context.Response))
+                using (var requestMessage = new RestRequestMessage(context.Request))
                 {
-                    this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
-                    if (requestMessage.Method.ToLowerInvariant() != "head")
+                    using (var responseMessage = new RestResponseMessage(context.Response))
                     {
-                        responseMessage.FlushResponseStream();
-                        responseMessage.Body?.Dispose();
+                        this.m_serviceDispatcher.Dispatch(requestMessage, responseMessage);
+                        if (requestMessage.Method.ToLowerInvariant() != "head")
+                        {
+                            responseMessage.FlushResponseStream();
+                            responseMessage.Body?.Dispose();
+                        }
                     }
                 }
             }
