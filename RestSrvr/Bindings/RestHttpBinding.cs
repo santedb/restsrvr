@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under 
  * the License.
  * 
- * User: fyfej
- * Date: 2023-6-21
  */
 using RestSrvr.Message;
 using System;
@@ -137,9 +135,41 @@ namespace RestSrvr.Bindings
                 Name = $"HttpBinding-{endpoint.Description.ListenUri}"
             };
 
-            this.m_httpListener.Start();
+            try
+            {
+                this.m_httpListener.Start();
+            }
+            catch (System.Net.HttpListenerException hlex)
+            {
+                DiagnoseListenerException(hlex, this.m_traceSource, serviceDispatcher, endpoint);
+                throw;
+            }
             this.m_acceptThread.Start();
 
+        }
+
+        private static void DiagnoseListenerException(HttpListenerException exception, TraceSource traceSource, ServiceDispatcher serviceDispatcher, ServiceEndpoint endpoint)
+        {
+            if (null == exception || null == traceSource)
+                return;
+
+            if (null == endpoint)
+            {
+                traceSource.TraceInformation("Missing endpoint configuration. Check the configuration source and ensure the ServiceEndpoint is not null.");
+                return;
+            }
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                switch (exception.ErrorCode)
+                {
+                    case 5: /*Access Denied*/
+                        traceSource.TraceInformation("Access Denied when binding listener to \"{0}\". Ensure that the current user has permission to bind to the http url. To add an acl entry, run the command \"netsh http add urlacl url={0} user={2}\\{1}\".", endpoint.Description.RawUrl, Environment.UserName, Environment.UserDomainName);
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         /// <summary>
