@@ -19,8 +19,11 @@
 namespace RestSrvr
 {
     /// <summary>
-    /// Represents a behavior on an service
+    /// Represents a behaviour on an service
     /// </summary>
+    /// <remarks>
+    /// Developers: your service behaviour must have a parameterless constructor for the factory to instantiate an instance.
+    /// </remarks>
     public interface IServiceBehavior
     {
 
