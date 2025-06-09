@@ -39,7 +39,7 @@ namespace RestSrvr.Attributes
     }
 
     /// <summary>
-    /// Represents a MIME encoding that a particular service understands for consumption
+    /// Represents a MIME encoding that a particular service produces in the response body if present.
     /// </summary>
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true)]
     [ExcludeFromCodeCoverage]
