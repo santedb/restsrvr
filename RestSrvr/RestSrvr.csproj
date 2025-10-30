@@ -60,7 +60,6 @@
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
     </PackageReference>
-    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
