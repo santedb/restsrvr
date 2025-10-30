@@ -291,6 +291,7 @@ namespace RestSrvr
                             {
                                 lastActivityJobTime = DateTime.Now.Ticks;
                                 Interlocked.Increment(ref m_busyWorkers);
+                                RestOperationContext.Current?.Dispose();
                                 wi.Callback(wi.State);
                             }
                             finally

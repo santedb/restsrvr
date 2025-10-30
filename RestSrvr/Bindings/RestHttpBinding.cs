@@ -84,6 +84,7 @@ namespace RestSrvr.Bindings
             finally
             {
                 RestOperationContext.Current.Dispose();
+                RestOperationContext.Current = null;
             }
         }
 
@@ -120,8 +121,6 @@ namespace RestSrvr.Bindings
                             }
                             catch (OperationCanceledException) { }
                         }
-
-                        // Queue work item to run the processing
 
                     }
                     catch (Exception e)
