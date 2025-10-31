@@ -104,8 +104,8 @@ namespace RestSrvr
                 // Apply the policy on the specified context
                 foreach (var pol in this.m_servicePolicies)
                 {
-                    RestOperationContext.Current.AddAppliedPolicy(pol);
                     pol.Apply(requestMessage);
+                    RestOperationContext.Current.AddAppliedPolicy(pol);
                 }
 
                 return ep.Dispatcher.Dispatch(this, requestMessage, responseMessage);
