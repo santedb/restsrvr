@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Runtime.CompilerServices;
 
 namespace RestSrvr
 {
@@ -34,6 +35,9 @@ namespace RestSrvr
         // Current reference for thread
         [ThreadStatic]
         private static RestOperationContext m_current;
+
+        // True when the context is disposed
+        private bool m_isDisposed = false;
 
         // Context
         private HttpListenerContext m_context;
@@ -82,7 +86,14 @@ namespace RestSrvr
         /// </summary>
         public static RestOperationContext Current
         {
-            get { return m_current; }
+            get {
+                if(m_current?.m_isDisposed == true)
+                {
+                    throw new ObjectDisposedException(nameof(RestOperationContext));
+                }
+
+                return m_current; 
+            }
             internal set { m_current = value; }
         }
 
@@ -103,6 +114,7 @@ namespace RestSrvr
         {
             this.m_context.Response.Close();
             this.Disposed?.Invoke(this, EventArgs.Empty);
+            this.m_isDisposed = true;
         }
 
         /// <summary>
