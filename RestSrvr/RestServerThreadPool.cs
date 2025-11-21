@@ -131,10 +131,6 @@ namespace RestSrvr
             /// </summary>
             public object State { get; set; }
 
-            /// <summary>
-            /// The execution context
-            /// </summary>
-            public ExecutionContext ExecutionContext { get; set; }
         }
 
         /// <summary>
@@ -165,8 +161,7 @@ namespace RestSrvr
                 WorkItem wd = new WorkItem()
                 {
                     Callback = callback,
-                    State = state,
-                    ExecutionContext = ExecutionContext.Capture()
+                    State = state
                 };
 
                 this.m_queue.Enqueue(wd);
@@ -297,6 +292,7 @@ namespace RestSrvr
                             finally
                             {
                                 Interlocked.Decrement(ref m_busyWorkers);
+                                RestOperationContext.Current?.Dispose();
                             }
 
                             if (token.IsCancellationRequested)
