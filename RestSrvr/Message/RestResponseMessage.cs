@@ -134,7 +134,11 @@ namespace RestSrvr.Message
                 this.m_content = ms;
                 ms.Seek(0, SeekOrigin.Begin);
             }
-            this.m_response.ContentLength64 = this.m_content?.Length ?? 0;
+
+            if (this.m_response.StatusCode >= 200 && this.m_response.StatusCode != 204)
+            {
+                this.m_response.ContentLength64 = this.m_content?.Length ?? 0;
+            }
 
             this.m_content?.CopyTo(this.m_response.OutputStream);
         }
