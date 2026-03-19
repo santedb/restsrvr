@@ -123,20 +123,28 @@ namespace RestSrvr.Message
         /// </summary>
         internal void FlushResponseStream()
         {
-            this.m_response.ContentEncoding = Encoding.UTF8;
-
-            if (!this.m_content?.CanSeek == true)
+            
+            if (this.m_response.StatusCode >= 200 && this.m_response.StatusCode != 204)
             {
-                var ms = new MemoryStream();
+                this.m_response.ContentEncoding = Encoding.UTF8;
 
-                this.m_content?.CopyTo(ms);
-                this.m_content?.Dispose();
-                this.m_content = ms;
-                ms.Seek(0, SeekOrigin.Begin);
+                if (!this.m_content?.CanSeek == true)
+                {
+                    var ms = new MemoryStream();
+
+                    this.m_content?.CopyTo(ms);
+                    this.m_content?.Dispose();
+                    this.m_content = ms;
+                    ms.Seek(0, SeekOrigin.Begin);
+                }
+
+                this.m_response.ContentLength64 = this.m_content?.Length ?? 0;
+                this.m_content?.CopyTo(this.m_response.OutputStream);
             }
-            this.m_response.ContentLength64 = this.m_content?.Length ?? 0;
-
-            this.m_content?.CopyTo(this.m_response.OutputStream);
+            else
+            {
+                this.m_response.ContentType = String.Empty;
+            }
         }
 
         /// <summary>
