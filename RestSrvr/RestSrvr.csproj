@@ -1,67 +1,39 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>3.0-debug</VersionNumber>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PackageId>RestSrvr</PackageId>
-    <Title>RestSrvr</Title>
-    <Version>$(VersionNumber)</Version>
-    <Description>The RestSrvr library represents a wrapper around .NET's HTTP API to provide a Windows Communication Foundation (WCF) REST like wrapper allowing for cross platform REST Server implementation used by the rest of SanteDB (Linux, Android, IOS, Windows, etc.)</Description>
-    <Authors>SanteSuite Contributors</Authors>
-    <PackageTags>SanteDB</PackageTags>
-    <RepositoryUrl>https://github.com/santedb/restsrvr</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <IncludeSymbols>true</IncludeSymbols>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-	    <Product>SanteDB</Product>
-    <Copyright>Copyright (C) 2015-2026 SanteSuite Contributors (See: NOTICES)</Copyright>
-    <Company>SanteSuite Contributors</Company>
-    <PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
-    <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
-  </PropertyGroup>    
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Any CPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Any CPU' ">
-    <DebugType>portable</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup>
-    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-  </PropertyGroup>
-   <ItemGroup>
-    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-  </ItemGroup>         
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\ServiceError.html" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\SanteDB.licenseheader">
-      <Link>SanteDB.licenseheader</Link>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net10.0;net48;netstandard2.0</TargetFrameworks>
+	</PropertyGroup>
+	<PropertyGroup>
+		<PackageId>RestSrvr</PackageId>
+		<Title>RestSrvr</Title>
+		<Version>$(VersionNumber)</Version>
+		<Description>The RestSrvr library represents a wrapper around .NET's HTTP API to provide a Windows Communication Foundation (WCF) REST like wrapper allowing for cross platform REST Server implementation used by the rest of SanteDB (Linux, Android, IOS, Windows, etc.)</Description>
+		<Authors>SanteSuite Contributors</Authors>
+		<PackageTags>SanteDB</PackageTags>
+		<RepositoryUrl>https://github.com/santedb/restsrvr</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<IncludeSymbols>true</IncludeSymbols>
+		<Product>SanteDB</Product>
+		<Copyright>Copyright (C) 2015-2026 SanteSuite Contributors (See: NOTICES)</Copyright>
+		<Company>SanteSuite Contributors</Company>
+		<PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
+		<PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\ServiceError.html" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="..\SanteDB.licenseheader">
+			<Link>SanteDB.licenseheader</Link>
+		</None>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+	</ItemGroup>
 </Project>
