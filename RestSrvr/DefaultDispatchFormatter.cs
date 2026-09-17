@@ -147,6 +147,7 @@ namespace RestSrvr
             ContentType contentType = RestOperationContext.Current.IncomingRequest.GetMostPreferredResponseContentType(
                         "application/json",
                         "text/xml",
+                        "application/xml",
                         "text/plain"
                     ) ?? new ContentType("application/json");
 
