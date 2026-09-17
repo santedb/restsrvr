@@ -25,7 +25,7 @@ namespace RestSrvr
                 .Where(x=> supportedMediaTypes?.Length == 0 || supportedMediaTypes.Contains(x.MediaType))
                 .OrderByDescending(x => float.TryParse(x.Parameters["q"], out var q) ? q : 1.0f)
                 .FirstOrDefault() ??
-                (String.IsNullOrEmpty(me.ContentType) ?
+                (!String.IsNullOrEmpty(me.ContentType) ?
                     new System.Net.Mime.ContentType(me.ContentType) :
                     null);   
     }
