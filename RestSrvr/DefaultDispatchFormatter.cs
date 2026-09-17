@@ -144,12 +144,11 @@ namespace RestSrvr
         /// </summary>
         public void SerializeResponse(RestResponseMessage responseMessage, object[] parameters, object result)
         {
-            var acceptHeader = RestOperationContext.Current.IncomingRequest.Headers["Accept"];
-            ContentType contentType = null;
-            if (!String.IsNullOrEmpty(acceptHeader))
-            {
-                contentType = acceptHeader.Split(',').Select(o => new ContentType(o)).First();
-            }
+            ContentType contentType = RestOperationContext.Current.IncomingRequest.GetMostPreferredResponseContentType(
+                        "application/json",
+                        "text/xml",
+                        "text/plain"
+                    ) ?? new ContentType("application/json");
 
             // By default unless Accept is application/json , we always prefer application/xml
             if (result == null)
