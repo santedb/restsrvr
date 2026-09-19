@@ -199,7 +199,7 @@ namespace RestSrvr
                         {
                             if (this.m_threadPool[i] == null)
                             {
-                                this.m_threadPool[i] = this.CreateThreadPoolThread();
+                                this.m_threadPool[i] = this.CreateThreadPoolThread(i);
                                 this.m_threadPool[i].Start(m_CancellationTokenSource.Token);
                             }
                         }
@@ -219,7 +219,7 @@ namespace RestSrvr
                 m_threadPool = new Thread[this.m_minPoolWorkers];
                 for (int i = 0; i < m_threadPool.Length; i++)
                 {
-                    m_threadPool[i] = this.CreateThreadPoolThread();
+                    m_threadPool[i] = this.CreateThreadPoolThread(i);
                     m_threadPool[i].Start(m_CancellationTokenSource.Token);
                 }
             }
@@ -228,11 +228,11 @@ namespace RestSrvr
         /// <summary>
         /// Create a thread pool thread
         /// </summary>
-        private Thread CreateThreadPoolThread()
+        private Thread CreateThreadPoolThread(int id)
         {
             return new Thread(this.DispatchLoop)
             {
-                Name = String.Format("RSRVR-ThreadPoolThread"),
+                Name = String.Format("RSRVR-ThreadPoolThread+{0}", id),
                 IsBackground = true,
                 Priority = ThreadPriority.AboveNormal
             };
